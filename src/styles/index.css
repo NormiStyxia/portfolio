@@ -610,7 +610,13 @@ img {
     background: rgba(232, 244, 252, 0.66);
   }
 
+  .lazy-video--tap-ready {
+    cursor: pointer;
+  }
+
   .lazy-video__play {
+    appearance: none;
+    cursor: pointer;
     position: absolute;
     z-index: 5;
     display: inline-flex;
@@ -649,6 +655,38 @@ img {
     right: 0.7rem;
     padding: 0.42rem 0.74rem;
     font-size: 0.72rem;
+  }
+
+  .lazy-video__status {
+    position: absolute;
+    left: 50%;
+    bottom: 0.75rem;
+    z-index: 6;
+    max-width: calc(100% - 1.5rem);
+    transform: translateX(-50%);
+    border-radius: 999px;
+    border: 1px solid rgba(137, 169, 202, 0.36);
+    background: rgba(255, 255, 255, 0.78);
+    color: #4f7897;
+    padding: 0.32rem 0.72rem;
+    box-shadow: 0 10px 22px rgba(49, 95, 159, 0.1);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+  }
+
+  .lazy-video__status--error {
+    color: #7b5f8f;
+    border-color: rgba(161, 132, 190, 0.34);
+  }
+
+  .lazy-video__modal-error {
+    border-radius: 999px;
+    border: 1px solid rgba(137, 169, 202, 0.38);
+    background: rgba(255, 255, 255, 0.82);
+    color: #4f7897;
+    padding: 0.5rem 0.85rem;
+    box-shadow: 0 12px 26px rgba(49, 95, 159, 0.12);
+    backdrop-filter: blur(8px);
   }
 
   .contact-panel {
@@ -757,6 +795,35 @@ img {
     color: #315f9f;
     padding: 0.25rem 0.58rem;
     box-shadow: 0 8px 18px rgba(49, 95, 159, 0.12);
+    backdrop-filter: blur(8px);
+  }
+
+  .video-badge {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    z-index: 7;
+    border-radius: 999px;
+    border: 1px solid rgba(137, 169, 202, 0.42);
+    background: rgba(255, 255, 255, 0.7);
+    color: #315f9f;
+    padding: 0.25rem 0.58rem;
+    box-shadow: 0 8px 18px rgba(49, 95, 159, 0.12);
+    backdrop-filter: blur(8px);
+  }
+
+  .video-mobile-hint {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    z-index: 7;
+    display: none;
+    border-radius: 999px;
+    border: 1px solid rgba(137, 169, 202, 0.36);
+    background: rgba(255, 255, 255, 0.76);
+    color: #4f7897;
+    padding: 0.32rem 0.7rem;
+    box-shadow: 0 10px 22px rgba(49, 95, 159, 0.1);
     backdrop-filter: blur(8px);
   }
 
@@ -996,8 +1063,13 @@ img {
 
   .tool-branch-card__action {
     position: static;
+    display: flex;
     width: fit-content;
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.78rem;
+  }
+
+  .tool-branch-card__action + .ui-tag-text {
+    display: block;
   }
 
   .tool-switch-hint {
@@ -1016,26 +1088,7 @@ img {
   }
 
   .gallery-video-hint {
-    bottom: 0.55rem;
-    left: 0.65rem;
-    right: auto;
-    max-width: calc(100% - 5.6rem);
-    transform: none;
-    white-space: normal;
-    opacity: 0.94;
-    padding: 0.28rem 0.55rem;
-  }
-
-  .gallery-video-hint {
-    font-size: 0;
-  }
-
-  .gallery-video-hint::after {
-    content: "点击播放";
-    font-family: var(--font-ui);
-    font-size: var(--text-tag);
-    font-weight: 650;
-    letter-spacing: 0.04em;
+    display: none;
   }
 
   .group:hover .gallery-video-hint {
@@ -1045,6 +1098,21 @@ img {
   .gallery-video-badge {
     left: 0.6rem;
     top: 0.6rem;
+  }
+
+  .video-badge {
+    left: 0.6rem;
+    top: 0.6rem;
+  }
+
+  .video-mobile-hint {
+    display: inline-flex;
+    bottom: 0.55rem;
+    right: 0.55rem;
+  }
+
+  .video-caption-icon {
+    display: none;
   }
 
   .process-prompt__input {

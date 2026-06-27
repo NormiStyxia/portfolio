@@ -67,23 +67,9 @@ function useMobileVideoMode() {
   return isMobileVideoMode;
 }
 
-function LazyVideo({
-  src,
-  poster,
-  title,
-  className = '',
-  controls = false,
-  muted = true,
-  fit = 'cover',
-  mobileOverlay = 'center',
-  mobileHint = '点击播放',
-  autoPlayOnMobileTap = true,
-}) {
+function useInView(rootMargin = '160px 0px') {
   const rootRef = useRef(null);
-  const videoRef = useRef(null);
-  const isMobileVideoMode = useMobileVideoMode();
   const [isInView, setIsInView] = useState(false);
-  const [isMobileActivated, setIsMobileActivated] = useState(false);
 
   useEffect(() => {
     const node = rootRef.current;
@@ -97,22 +83,79 @@ function LazyVideo({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const visible = entry.isIntersecting || entry.intersectionRatio > 0;
-        setIsInView(visible);
-
-        if (!visible) {
-          videoRef.current?.pause();
-        }
+        setIsInView(entry.isIntersecting || entry.intersectionRatio > 0);
       },
-      { rootMargin: '160px 0px', threshold: 0.08 },
+      { rootMargin, threshold: 0.08 },
     );
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [rootMargin]);
+
+  return [rootRef, isInView];
+}
+
+function LazyImage({ src, poster, alt = '', className = '', animated = false, eager = false, ...props }) {
+  const [rootRef, isInView] = useInView(eager ? '320px 0px' : '160px 0px');
+  const isMobileVideoMode = useMobileVideoMode();
+  const [loadedSrc, setLoadedSrc] = useState('');
+  const [failed, setFailed] = useState(false);
+  const shouldUsePosterFirst = Boolean(animated && poster && isMobileVideoMode);
+  const shouldAttachSrc = Boolean(src && !failed && (eager || isInView) && (!shouldUsePosterFirst || isInView));
+  const displaySrc = shouldAttachSrc ? src : poster || src;
+
+  useEffect(() => {
+    if (shouldAttachSrc) {
+      setLoadedSrc(src);
+      return;
+    }
+
+    setLoadedSrc(poster || '');
+  }, [poster, shouldAttachSrc, src]);
+
+  return (
+    <img
+      ref={rootRef}
+      className={className}
+      src={loadedSrc || displaySrc}
+      alt={alt}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      onError={() => {
+        setFailed(true);
+        setLoadedSrc(poster || '');
+      }}
+      {...props}
+    />
+  );
+}
+
+function LazyVideo({
+  src,
+  poster,
+  title,
+  className = '',
+  controls = false,
+  muted = true,
+  fit = 'cover',
+  mobileOverlay = 'center',
+  mobileHint = '点击播放',
+  autoPlayOnMobileTap = true,
+}) {
+  const videoRef = useRef(null);
+  const isMobileVideoMode = useMobileVideoMode();
+  const [rootRef, isInView] = useInView();
+  const [isMobileActivated, setIsMobileActivated] = useState(false);
+  const [videoState, setVideoState] = useState('idle');
 
   const shouldAttachSource = Boolean(src && isInView && (!isMobileVideoMode || isMobileActivated));
-  const showMobilePoster = Boolean(isMobileVideoMode && !isMobileActivated);
+  const showMobilePoster = Boolean(isMobileVideoMode && (!isMobileActivated || videoState === 'error'));
+
+  useEffect(() => {
+    if (!isInView) {
+      videoRef.current?.pause();
+    }
+  }, [isInView]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -135,7 +178,13 @@ function LazyVideo({
 
     if (!src || !video) return;
 
+    setVideoState('loading');
     setIsMobileActivated(true);
+    video.controls = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
 
     if (video.getAttribute('src') !== src) {
       video.setAttribute('src', src);
@@ -144,7 +193,9 @@ function LazyVideo({
 
     if (autoPlayOnMobileTap) {
       await video.play().catch(() => {
-        // Mobile browsers may require the native play control after source loading.
+        // Some mobile browsers block programmatic playback even after a tap.
+        // Keep native controls visible instead of treating this as a load failure.
+        setVideoState('ready');
       });
     }
   };
@@ -162,10 +213,28 @@ function LazyVideo({
     }
 
     setIsMobileActivated(false);
+    setVideoState('idle');
   };
 
   return (
-    <div ref={rootRef} className={`lazy-video ${showMobilePoster ? 'lazy-video--poster' : ''} ${className}`}>
+    <div
+      ref={rootRef}
+      className={`lazy-video ${showMobilePoster ? 'lazy-video--poster' : ''} ${showMobilePoster && mobileOverlay !== 'compact' ? 'lazy-video--tap-ready' : ''} ${className}`}
+      onClick={showMobilePoster && mobileOverlay !== 'compact' ? activateMobileVideo : undefined}
+      role={showMobilePoster && mobileOverlay !== 'compact' ? 'button' : undefined}
+      tabIndex={showMobilePoster && mobileOverlay !== 'compact' ? 0 : undefined}
+      onKeyDown={
+        showMobilePoster && mobileOverlay !== 'compact'
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activateMobileVideo();
+              }
+            }
+          : undefined
+      }
+      aria-label={showMobilePoster && mobileOverlay !== 'compact' ? mobileHint : undefined}
+    >
       <video
         ref={videoRef}
         className={`h-full w-full object-${fit}`}
@@ -178,8 +247,18 @@ function LazyVideo({
         aria-label={title}
         data-lazy-src={src}
         onEnded={handleEnded}
+        onLoadStart={() => setVideoState('loading')}
+        onCanPlay={() => setVideoState('ready')}
+        onError={() => {
+          const video = videoRef.current;
+          video?.pause();
+          video?.removeAttribute('src');
+          video?.load();
+          setIsMobileActivated(false);
+          setVideoState('error');
+        }}
       />
-      {showMobilePoster ? (
+      {showMobilePoster && mobileOverlay === 'compact' ? (
         <span
           className={`lazy-video__play lazy-video__play--${mobileOverlay} ui-button-text`}
           onClick={mobileOverlay === 'compact' ? undefined : activateMobileVideo}
@@ -198,9 +277,24 @@ function LazyVideo({
           aria-label={mobileHint}
         >
           <Play size={mobileOverlay === 'compact' ? 15 : 22} fill="currentColor" strokeWidth={1.8} />
-          {mobileOverlay === 'compact' ? <span>{mobileHint}</span> : null}
+          {mobileOverlay === 'compact' ? <span>{videoState === 'error' ? '点击重试' : mobileHint}</span> : null}
         </span>
       ) : null}
+      {showMobilePoster && mobileOverlay !== 'compact' ? (
+        <button
+          className={`lazy-video__play lazy-video__play--${mobileOverlay} ui-button-text`}
+          onClick={(event) => {
+            event.stopPropagation();
+            activateMobileVideo();
+          }}
+          type="button"
+          aria-label={mobileHint}
+        >
+          <Play size={22} fill="currentColor" strokeWidth={1.8} />
+        </button>
+      ) : null}
+      {isMobileVideoMode && isMobileActivated && videoState === 'loading' ? <span className="lazy-video__status ui-tag-text">加载中...</span> : null}
+      {isMobileVideoMode && videoState === 'error' ? <span className="lazy-video__status lazy-video__status--error ui-tag-text">加载失败，点击重试</span> : null}
     </div>
   );
 }
@@ -383,6 +477,7 @@ function GameplayVideoFrame({ video, poster, label }) {
     <figure className="overflow-hidden rounded-[22px] border border-white/90 bg-shell/60 shadow-[inset_0_0_0_1px_rgba(137,169,202,0.18)]">
       <div className="relative aspect-video bg-skyglass/30">
         {video?.src ? (
+          <>
           <LazyVideo
             className="h-full w-full"
             controls
@@ -391,6 +486,9 @@ function GameplayVideoFrame({ video, poster, label }) {
             src={video.src}
             title={video.title}
           />
+            <span className="video-badge ui-tag-text">VIDEO</span>
+            <span className="video-mobile-hint ui-tag-text">点击播放</span>
+          </>
         ) : poster?.src ? (
           <div className="group relative h-full w-full overflow-hidden">
             <img className="h-full w-full object-cover opacity-90" src={poster.src} alt={poster.title} loading="lazy" decoding="async" />
@@ -411,9 +509,38 @@ function GameplayVideoFrame({ video, poster, label }) {
       </div>
       <figcaption className="caption-text flex items-center justify-between px-4 py-3 text-muted">
         <span>{label}</span>
-        <Play size={14} fill="currentColor" strokeWidth={1.7} />
+        <Play className="video-caption-icon" size={14} fill="currentColor" strokeWidth={1.7} />
       </figcaption>
     </figure>
+  );
+}
+
+function ModalVideo({ item }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-shell/70">
+      {failed ? (
+        <div className="grid min-h-[15rem] place-items-center text-center">
+          {item.poster ? <img className="absolute inset-0 h-full w-full object-contain opacity-70" src={item.poster} alt="" decoding="async" /> : null}
+          <p className="lazy-video__modal-error ui-tag-text relative z-10">加载失败，请返回卡片重试</p>
+        </div>
+      ) : (
+        <video
+          className="max-h-[76vh] w-full object-contain"
+          controls
+          autoPlay
+          muted
+          playsInline
+          webkit-playsinline="true"
+          poster={item.poster}
+          preload="metadata"
+          onError={() => setFailed(true)}
+        >
+          <source src={item.src} type="video/mp4" />
+        </video>
+      )}
+    </div>
   );
 }
 
@@ -421,7 +548,7 @@ function HeroSection() {
   const { profile, heroActions } = portfolioData;
   const [projectAction, demoAction, editorAction, galleryAction, workflowAction] = heroActions;
   const { frame, bird, titleRibbon } = portfolioAssets.uiSkin;
-  const { avatar, bottomFlowers, splitBirds, cornerBird } = portfolioAssets.heroProfile;
+  const { avatar, avatarPoster, bottomFlowers, splitBirds, cornerBird } = portfolioAssets.heroProfile;
 
   return (
     <section id="top" className={`${sectionClass} pt-10 sm:pt-14`}>
@@ -435,7 +562,15 @@ function HeroSection() {
             <div className="absolute -inset-4 rounded-[36px] bg-skyglass/50 blur-2xl" />
             <div className="relative rotate-[-1.4deg] rounded-[30px] border border-line/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(78,126,168,0.22)] backdrop-blur">
               <div className="relative aspect-square overflow-hidden rounded-[22px] border-2 border-[#2d5d9d]/85 bg-shell">
-                <img className="h-full w-full scale-[1.12] object-cover" src={avatar.src} alt={avatar.title} loading="eager" decoding="async" fetchPriority="high" />
+                <LazyImage
+                  animated
+                  eager
+                  className="h-full w-full scale-[1.12] object-cover"
+                  src={avatar.src}
+                  poster={avatar.poster || avatarPoster?.src}
+                  alt={avatar.title}
+                  fetchPriority="high"
+                />
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.24),transparent_42%,rgba(217,236,250,0.2))]" />
               </div>
               <img className="hero-float-birds pointer-events-none absolute left-1/2 top-1/2 z-10 w-[135%] max-w-none opacity-95" src={splitBirds.src} alt="" aria-hidden="true" loading="eager" decoding="async" />
@@ -507,6 +642,7 @@ function GameDemoSection() {
         <div className="grid gap-6 lg:grid-cols-[1.32fr_0.68fr]">
           <Panel className="p-4" id="tapmaker-demo">
             <GameplayVideoFrame video={gameplayVideo} poster={demoPoster} label="序章实机画面" />
+            <p className="archive-note ui-tag-text mt-4">✦ 开发中记录：《幻界行者·序章》阶段性 Demo，画面、关卡与玩法会持续继续调整。</p>
           </Panel>
 
           <Panel className="p-5">
@@ -750,18 +886,7 @@ function ArtGallerySection() {
         >
           <div className="max-h-[90vh] max-w-5xl rounded-[24px] border border-white/80 bg-mist p-4 shadow-panel" onClick={(event) => event.stopPropagation()}>
             {activeImage.type === 'video' ? (
-              <video
-                className="max-h-[76vh] w-full rounded-2xl object-contain"
-                controls
-                autoPlay
-                muted
-                playsInline
-                webkit-playsinline="true"
-                poster={activeImage.poster}
-                preload="metadata"
-              >
-                <source src={activeImage.src} type="video/mp4" />
-              </video>
+              <ModalVideo item={activeImage} />
             ) : (
               <img className="max-h-[76vh] w-full object-contain" src={activeImage.src} alt={activeImage.title} decoding="async" />
             )}
@@ -829,8 +954,8 @@ function ContactSection() {
   const { contact } = portfolioData;
   const [copiedEmail, setCopiedEmail] = useState(false);
   const links = [
-    { label: 'TapTap 主页', href: contact.tapmakerHome, icon: Sparkles },
-    { label: 'Bilibili 主页', href: contact.bilibiliHome, icon: Play },
+    { label: 'TapTap', href: contact.tapmakerHome, icon: Sparkles },
+    { label: 'Bilibili', href: contact.bilibiliHome, icon: Play },
     { label: 'GitHub', href: contact.github, icon: Github },
     { label: copiedEmail ? '邮箱已复制' : '邮箱', href: contact.email, icon: Mail, copy: true },
   ];
@@ -875,7 +1000,14 @@ function ContactSection() {
             })}
           </div>
         </div>
-        <img className="contact-mascot" src={portfolioAssets.contactMascot.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <LazyImage
+          animated
+          className="contact-mascot"
+          src={portfolioAssets.contactMascot.src}
+          poster={portfolioAssets.contactMascot.poster}
+          alt=""
+          aria-hidden="true"
+        />
       </Panel>
     </DecoratedSection>
   );

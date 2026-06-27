@@ -41,6 +41,7 @@ export const portfolioAssets = {
     titleRibbon: { src: 'assets/portfolio/ui-task-5.png', title: '任务标题条' },
   },
   heroProfile: {
+    avatarPoster: { src: 'assets/portfolio/hero/avatar-poster.png', title: '头像静态封面' },
     avatar: { src: 'assets/portfolio/hero/avatar.gif', title: '诺米styxia 头像' },
     bottomFlowers: { src: 'assets/portfolio/hero/avatar-flowers-bottom.png', title: '头像下侧花朵装饰' },
     splitBirds: { src: 'assets/portfolio/hero/avatar-birds-split.png', title: '头像两侧飞鸟装饰' },
@@ -48,6 +49,7 @@ export const portfolioAssets = {
   },
   contactMascot: {
     src: 'assets/portfolio/contact-mascot.gif',
+    poster: 'assets/portfolio/contact-mascot-poster.png',
     title: '联系模块小人动效',
   },
   artGallery: [
