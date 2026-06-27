@@ -595,6 +595,62 @@ img {
     line-height: 1.75;
   }
 
+  .lazy-video {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(232, 244, 252, 0.72), rgba(255, 255, 255, 0.58));
+  }
+
+  .lazy-video video {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: rgba(232, 244, 252, 0.66);
+  }
+
+  .lazy-video__play {
+    position: absolute;
+    z-index: 5;
+    display: inline-flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.38rem;
+    border: 1px solid rgba(137, 169, 202, 0.54);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    color: #315f9f;
+    box-shadow: 0 12px 28px rgba(76, 123, 166, 0.18);
+    backdrop-filter: blur(10px);
+    transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+  }
+
+  .lazy-video__play:active {
+    transform: scale(0.97);
+  }
+
+  .lazy-video__play--center {
+    left: 50%;
+    top: 50%;
+    height: 3.2rem;
+    width: 3.2rem;
+    transform: translate(-50%, -50%);
+  }
+
+  .lazy-video__play--center:active {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  .lazy-video__play--compact {
+    bottom: 0.7rem;
+    right: 0.7rem;
+    padding: 0.42rem 0.74rem;
+    font-size: 0.72rem;
+  }
+
   .contact-panel {
     position: relative;
     border: 1px solid transparent;
@@ -881,6 +937,145 @@ img {
     right: 1rem;
     width: 8.75rem;
     opacity: 0.78;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --text-section: clamp(1.9rem, 11vw, 2.85rem);
+    --text-card: clamp(1.18rem, 6vw, 1.48rem);
+    --text-body: 0.98rem;
+    --text-button: 0.9rem;
+    --text-tag: 0.78rem;
+  }
+
+  html {
+    scroll-padding-top: 72px;
+  }
+
+  .archive-section {
+    border-radius: 1.45rem;
+    padding: 1.05rem;
+  }
+
+  .archive-section__clock {
+    display: none;
+  }
+
+  .section-title-wrap,
+  .profile-name-wrap {
+    padding-left: 0.45rem;
+    padding-right: 0.55rem;
+  }
+
+  .profile-name {
+    font-size: clamp(2.35rem, 14vw, 3.55rem);
+  }
+
+  .hero-transition-cta {
+    padding: 1.25rem 0 1.15rem;
+  }
+
+  .hero-ribbon-button {
+    min-height: 3.25rem;
+    width: min(100%, 17.5rem);
+  }
+
+  .hero-explore-link,
+  .gallery-tab,
+  .contact-link-card,
+  .ui-button-text.rounded-full,
+  .tool-branch-card {
+    min-height: 44px;
+  }
+
+  .tool-branch-card {
+    min-height: 9.2rem;
+    padding: 1rem;
+  }
+
+  .tool-branch-card__action {
+    position: static;
+    width: fit-content;
+    margin-bottom: 0.55rem;
+  }
+
+  .tool-switch-hint {
+    margin-top: -0.1rem;
+  }
+
+  .lazy-video__play--center {
+    height: 3.1rem;
+    width: 3.1rem;
+  }
+
+  .lazy-video__play--compact {
+    bottom: 0.55rem;
+    right: 0.55rem;
+    padding: 0.38rem 0.64rem;
+  }
+
+  .gallery-video-hint {
+    bottom: 0.55rem;
+    left: 0.65rem;
+    right: auto;
+    max-width: calc(100% - 5.6rem);
+    transform: none;
+    white-space: normal;
+    opacity: 0.94;
+    padding: 0.28rem 0.55rem;
+  }
+
+  .gallery-video-hint {
+    font-size: 0;
+  }
+
+  .gallery-video-hint::after {
+    content: "点击播放";
+    font-family: var(--font-ui);
+    font-size: var(--text-tag);
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+
+  .group:hover .gallery-video-hint {
+    transform: none;
+  }
+
+  .gallery-video-badge {
+    left: 0.6rem;
+    top: 0.6rem;
+  }
+
+  .process-prompt__input {
+    min-height: 4rem;
+    gap: 0.45rem;
+    padding: 0.65rem;
+  }
+
+  .process-prompt__actions {
+    gap: 0.28rem;
+  }
+
+  .process-prompt__icon {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .contact-panel {
+    padding-bottom: 6.5rem;
+  }
+
+  .contact-links-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fixed.inset-0.z-50 {
+    padding: 0.75rem;
+  }
+
+  video[controls] {
+    max-height: 68vh;
   }
 }
 

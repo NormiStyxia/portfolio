@@ -53,6 +53,7 @@ export const portfolioAssets = {
   artGallery: [
     {
       src: 'assets/portfolio/gallery/motion/title-screen.mp4',
+      poster: 'assets/portfolio/game-login.png',
       title: '云端',
       description: '标题界面动效',
       tags: '动态效果 / 视频',
@@ -61,6 +62,7 @@ export const portfolioAssets = {
     },
     {
       src: 'assets/portfolio/gallery/motion/main-ui.mp4',
+      poster: 'assets/portfolio/game-main.png',
       title: '紫藤庭院',
       description: '主界面动效',
       tags: '动态效果 / 仿 Spine 分层动画',
@@ -69,6 +71,7 @@ export const portfolioAssets = {
     },
     {
       src: 'assets/portfolio/gallery/motion/level-select.mp4',
+      poster: 'assets/portfolio/game-level-select.png',
       title: '圣像',
       description: '关卡选择界面动效',
       tags: '动态效果 / NanoVG 实时重绘',

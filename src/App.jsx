@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Github, Mail, Maximize2, Mic, Play, Plus, Send, Sparkles, Wrench } from 'lucide-react';
 import { portfolioAssets } from './data/assets.js';
 import { portfolioData } from './data/portfolioData.js';
@@ -9,6 +9,7 @@ const toolHashById = {
   editor: '#tools-editor',
   ai: '#tools-ai',
 };
+const mobileVideoQuery = '(max-width: 767px), (hover: none), (pointer: coarse)';
 
 function getToolFromHash() {
   if (typeof window === 'undefined') {
@@ -33,10 +34,189 @@ function externalLinkProps(href) {
   };
 }
 
+function isMobileVideoEnvironment() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const touchLikeDevice = window.matchMedia?.(mobileVideoQuery).matches;
+  const mobileUserAgent = /Android|iPhone|iPad|iPod|Mobile|MicroMessenger/i.test(window.navigator.userAgent);
+  return Boolean(touchLikeDevice || mobileUserAgent);
+}
+
+function useMobileVideoMode() {
+  const [isMobileVideoMode, setIsMobileVideoMode] = useState(isMobileVideoEnvironment);
+
+  useEffect(() => {
+    const media = window.matchMedia?.(mobileVideoQuery);
+    const updateMode = () => setIsMobileVideoMode(isMobileVideoEnvironment());
+
+    updateMode();
+
+    if (!media) return undefined;
+
+    media.addEventListener?.('change', updateMode);
+    media.addListener?.(updateMode);
+
+    return () => {
+      media.removeEventListener?.('change', updateMode);
+      media.removeListener?.(updateMode);
+    };
+  }, []);
+
+  return isMobileVideoMode;
+}
+
+function LazyVideo({
+  src,
+  poster,
+  title,
+  className = '',
+  controls = false,
+  muted = true,
+  fit = 'cover',
+  mobileOverlay = 'center',
+  mobileHint = '点击播放',
+  autoPlayOnMobileTap = true,
+}) {
+  const rootRef = useRef(null);
+  const videoRef = useRef(null);
+  const isMobileVideoMode = useMobileVideoMode();
+  const [isInView, setIsInView] = useState(false);
+  const [isMobileActivated, setIsMobileActivated] = useState(false);
+
+  useEffect(() => {
+    const node = rootRef.current;
+
+    if (!node) return undefined;
+
+    if (!('IntersectionObserver' in window)) {
+      setIsInView(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting || entry.intersectionRatio > 0;
+        setIsInView(visible);
+
+        if (!visible) {
+          videoRef.current?.pause();
+        }
+      },
+      { rootMargin: '160px 0px', threshold: 0.08 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const shouldAttachSource = Boolean(src && isInView && (!isMobileVideoMode || isMobileActivated));
+  const showMobilePoster = Boolean(isMobileVideoMode && !isMobileActivated);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    if (!shouldAttachSource) {
+      video.pause();
+      return;
+    }
+
+    if (src && video.getAttribute('src') !== src) {
+      video.setAttribute('src', src);
+      video.load();
+    }
+  }, [shouldAttachSource, src]);
+
+  const activateMobileVideo = async () => {
+    const video = videoRef.current;
+
+    if (!src || !video) return;
+
+    setIsMobileActivated(true);
+
+    if (video.getAttribute('src') !== src) {
+      video.setAttribute('src', src);
+      video.load();
+    }
+
+    if (autoPlayOnMobileTap) {
+      await video.play().catch(() => {
+        // Mobile browsers may require the native play control after source loading.
+      });
+    }
+  };
+
+  const handleEnded = () => {
+    if (!isMobileVideoMode) return;
+
+    const video = videoRef.current;
+    video?.pause();
+
+    if (video) {
+      video.currentTime = 0;
+      video.removeAttribute('src');
+      video.load();
+    }
+
+    setIsMobileActivated(false);
+  };
+
+  return (
+    <div ref={rootRef} className={`lazy-video ${showMobilePoster ? 'lazy-video--poster' : ''} ${className}`}>
+      <video
+        ref={videoRef}
+        className={`h-full w-full object-${fit}`}
+        controls={controls && (!isMobileVideoMode || isMobileActivated)}
+        muted={muted}
+        playsInline
+        webkit-playsinline="true"
+        poster={poster}
+        preload="metadata"
+        aria-label={title}
+        data-lazy-src={src}
+        onEnded={handleEnded}
+      />
+      {showMobilePoster ? (
+        <span
+          className={`lazy-video__play lazy-video__play--${mobileOverlay} ui-button-text`}
+          onClick={mobileOverlay === 'compact' ? undefined : activateMobileVideo}
+          onKeyDown={
+            mobileOverlay === 'compact'
+              ? undefined
+              : (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    activateMobileVideo();
+                  }
+                }
+          }
+          role={mobileOverlay === 'compact' ? undefined : 'button'}
+          tabIndex={mobileOverlay === 'compact' ? undefined : 0}
+          aria-label={mobileHint}
+        >
+          <Play size={mobileOverlay === 'compact' ? 15 : 22} fill="currentColor" strokeWidth={1.8} />
+          {mobileOverlay === 'compact' ? <span>{mobileHint}</span> : null}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function playPreviewVideo(event) {
+  if (isMobileVideoEnvironment()) return;
+
   const video = event.currentTarget.querySelector('video');
 
   if (!video) return;
+
+  const lazySource = video.dataset.lazySrc;
+  if (lazySource && video.getAttribute('src') !== lazySource) {
+    video.setAttribute('src', lazySource);
+    video.load();
+  }
 
   video.currentTime = 0;
   video.play().catch(() => {
@@ -45,6 +225,8 @@ function playPreviewVideo(event) {
 }
 
 function stopPreviewVideo(event) {
+  if (isMobileVideoEnvironment()) return;
+
   const video = event.currentTarget.querySelector('video');
 
   if (!video) return;
@@ -91,7 +273,7 @@ function ButtonLink({ href, children, variant = 'primary' }) {
 function RibbonButton({ href, children, skin, className = '' }) {
   return (
     <a className={`hero-ribbon-button ui-button-text ${className}`} href={href} {...externalLinkProps(href)}>
-      <img className="hero-ribbon-button__skin" src={skin.src} alt="" aria-hidden="true" />
+      <img className="hero-ribbon-button__skin" src={skin.src} alt="" aria-hidden="true" decoding="async" />
       <span className="hero-ribbon-button__content">
         {children}
         <ArrowUpRight size={15} strokeWidth={1.8} />
@@ -143,9 +325,9 @@ function DecoratedSection({
   return (
     <section id={id} className={`${sectionClass} py-12 ${className}`}>
       <div className={`archive-section archive-section--${type}`}>
-        <img className="archive-section__frame" src={frame.src} alt="" aria-hidden="true" />
+        <img className="archive-section__frame" src={frame.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />
         {showClock ? <RomanClockDecor /> : null}
-        {showBird ? <img className="archive-section__bird" src={bird.src} alt="" aria-hidden="true" /> : null}
+        {showBird ? <img className="archive-section__bird" src={bird.src} alt="" aria-hidden="true" loading="lazy" decoding="async" /> : null}
         {showGrid ? <div className="archive-section__grid" aria-hidden="true" /> : null}
         <div className={`archive-section__content ${contentClassName}`}>{children}</div>
       </div>
@@ -164,7 +346,7 @@ function SectionTitle({ eyebrow, title, children, asideImage, wide = false }) {
           <span className="section-corner-star section-corner-star--right" aria-hidden="true" />
         </div>
         {asideImage ? (
-          <img className="project-title-mascot" src={asideImage.src} alt={asideImage.title} />
+          <img className="project-title-mascot" src={asideImage.src} alt={asideImage.title} loading="lazy" decoding="async" />
         ) : null}
       </div>
       {Array.isArray(children) ? (
@@ -186,7 +368,7 @@ function ScreenshotFrame({ image, label, tall = false }) {
   return (
     <figure className="overflow-hidden rounded-[18px] border border-white/90 bg-shell/60">
       <div className={`bg-skyglass/30 ${tall ? 'aspect-[4/3]' : 'aspect-video'}`}>
-        <img className="h-full w-full object-cover" src={image.src} alt={image.title} />
+        <img className="h-full w-full object-cover" src={image.src} alt={image.title} loading="lazy" decoding="async" />
       </div>
       <figcaption className="caption-text flex items-center justify-between px-4 py-3 text-muted">
         <span>{label}</span>
@@ -201,12 +383,17 @@ function GameplayVideoFrame({ video, poster, label }) {
     <figure className="overflow-hidden rounded-[22px] border border-white/90 bg-shell/60 shadow-[inset_0_0_0_1px_rgba(137,169,202,0.18)]">
       <div className="relative aspect-video bg-skyglass/30">
         {video?.src ? (
-          <video className="h-full w-full object-cover" controls muted playsInline poster={poster?.src} preload="metadata">
-            <source src={video.src} type="video/mp4" />
-          </video>
+          <LazyVideo
+            className="h-full w-full"
+            controls
+            mobileHint="播放预览"
+            poster={poster?.src}
+            src={video.src}
+            title={video.title}
+          />
         ) : poster?.src ? (
           <div className="group relative h-full w-full overflow-hidden">
-            <img className="h-full w-full object-cover opacity-90" src={poster.src} alt={poster.title} />
+            <img className="h-full w-full object-cover opacity-90" src={poster.src} alt={poster.title} loading="lazy" decoding="async" />
             <div className="absolute inset-0 grid place-items-center bg-white/10">
               <span className="grid h-14 w-14 place-items-center rounded-full border border-white/80 bg-white/70 text-[#4f7897] shadow-[0_14px_34px_rgba(76,123,166,0.18)] backdrop-blur">
                 <Play size={24} fill="currentColor" />
@@ -239,21 +426,21 @@ function HeroSection() {
   return (
     <section id="top" className={`${sectionClass} pt-10 sm:pt-14`}>
       <div className="relative overflow-hidden rounded-[34px] border border-white/80 bg-gradient-to-br from-white/86 via-shell/76 to-skyglass/56 px-5 py-6 shadow-panel sm:px-8 sm:py-12">
-        <img className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.22]" src={frame.src} alt="" aria-hidden="true" />
+        <img className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.22]" src={frame.src} alt="" aria-hidden="true" decoding="async" />
         <div className="pointer-events-none absolute left-8 top-8 hidden h-16 w-16 rotate-45 border border-white/75 sm:block" />
-        <img className="pointer-events-none absolute bottom-8 right-9 hidden w-16 opacity-70 sm:block" src={bird.src} alt="" aria-hidden="true" />
+        <img className="pointer-events-none absolute bottom-8 right-9 hidden w-16 opacity-70 sm:block" src={bird.src} alt="" aria-hidden="true" decoding="async" />
 
         <div className="relative z-10 mx-auto grid max-w-5xl items-center gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:gap-12">
           <div className="relative mx-auto w-full max-w-[230px] sm:max-w-[340px] lg:mx-0">
             <div className="absolute -inset-4 rounded-[36px] bg-skyglass/50 blur-2xl" />
             <div className="relative rotate-[-1.4deg] rounded-[30px] border border-line/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(78,126,168,0.22)] backdrop-blur">
               <div className="relative aspect-square overflow-hidden rounded-[22px] border-2 border-[#2d5d9d]/85 bg-shell">
-                <img className="h-full w-full scale-[1.12] object-cover" src={avatar.src} alt={avatar.title} />
+                <img className="h-full w-full scale-[1.12] object-cover" src={avatar.src} alt={avatar.title} loading="eager" decoding="async" fetchPriority="high" />
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.24),transparent_42%,rgba(217,236,250,0.2))]" />
               </div>
-              <img className="hero-float-birds pointer-events-none absolute left-1/2 top-1/2 z-10 w-[135%] max-w-none opacity-95" src={splitBirds.src} alt="" aria-hidden="true" />
-              <img className="hero-float-flowers pointer-events-none absolute left-1/2 bottom-[-17%] z-20 w-[128%] max-w-none opacity-95" src={bottomFlowers.src} alt="" aria-hidden="true" />
-              <img className="hero-corner-bird pointer-events-none absolute" src={cornerBird.src} alt="" aria-hidden="true" />
+              <img className="hero-float-birds pointer-events-none absolute left-1/2 top-1/2 z-10 w-[135%] max-w-none opacity-95" src={splitBirds.src} alt="" aria-hidden="true" loading="eager" decoding="async" />
+              <img className="hero-float-flowers pointer-events-none absolute left-1/2 bottom-[-17%] z-20 w-[128%] max-w-none opacity-95" src={bottomFlowers.src} alt="" aria-hidden="true" loading="eager" decoding="async" />
+              <img className="hero-corner-bird pointer-events-none absolute" src={cornerBird.src} alt="" aria-hidden="true" loading="eager" decoding="async" />
             </div>
           </div>
 
@@ -349,7 +536,7 @@ function GameDemoSection() {
         </div>
 
       </div>
-      <img className="prologue-illustration" src={portfolioAssets.prologueIllustration.src} alt="" aria-hidden="true" />
+      <img className="prologue-illustration" src={portfolioAssets.prologueIllustration.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />
     </DecoratedSection>
   );
 }
@@ -531,14 +718,19 @@ function ArtGallerySection() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-shell/70">
               {item.type === 'video' ? (
                 <>
-                  <video className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03] group-hover:brightness-[1.04]" muted playsInline preload="metadata">
-                    <source src={item.src} type="video/mp4" />
-                  </video>
+                  <LazyVideo
+                    className="h-full w-full transition duration-300 group-hover:scale-[1.03] group-hover:brightness-[1.04]"
+                    mobileHint="点击播放"
+                    mobileOverlay="compact"
+                    poster={item.poster}
+                    src={item.src}
+                    title={item.title}
+                  />
                   <span className="gallery-video-badge ui-tag-text">VIDEO</span>
                   <span className="gallery-video-hint ui-tag-text">悬停预览 · 点击播放</span>
                 </>
               ) : (
-                <img className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]" src={item.src} alt={item.title} />
+                <img className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]" src={item.src} alt={item.title} loading="lazy" decoding="async" />
               )}
             </div>
             <div className="mt-3">
@@ -558,11 +750,20 @@ function ArtGallerySection() {
         >
           <div className="max-h-[90vh] max-w-5xl rounded-[24px] border border-white/80 bg-mist p-4 shadow-panel" onClick={(event) => event.stopPropagation()}>
             {activeImage.type === 'video' ? (
-              <video className="max-h-[76vh] w-full rounded-2xl object-contain" controls autoPlay muted playsInline>
+              <video
+                className="max-h-[76vh] w-full rounded-2xl object-contain"
+                controls
+                autoPlay
+                muted
+                playsInline
+                webkit-playsinline="true"
+                poster={activeImage.poster}
+                preload="metadata"
+              >
                 <source src={activeImage.src} type="video/mp4" />
               </video>
             ) : (
-              <img className="max-h-[76vh] w-full object-contain" src={activeImage.src} alt={activeImage.title} />
+              <img className="max-h-[76vh] w-full object-contain" src={activeImage.src} alt={activeImage.title} decoding="async" />
             )}
             <div className="ui-tag-text mt-3 flex items-center justify-between gap-4 text-muted">
               <span>
@@ -674,7 +875,7 @@ function ContactSection() {
             })}
           </div>
         </div>
-        <img className="contact-mascot" src={portfolioAssets.contactMascot.src} alt="" aria-hidden="true" />
+        <img className="contact-mascot" src={portfolioAssets.contactMascot.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />
       </Panel>
     </DecoratedSection>
   );

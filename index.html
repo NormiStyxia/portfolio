@@ -8,9 +8,205 @@
       content="Portfolio for an AI-assisted game creator, TapTap Maker developer, visual editor builder, and game UI creator."
     />
     <title>幻界行者·序章 | 诺米styxia Portfolio</title>
+    <style>
+      body.loading-lock {
+        overflow: hidden;
+      }
+
+      #root {
+        opacity: 1;
+        transition: opacity 420ms ease;
+      }
+
+      body.loading-lock #root {
+        opacity: 0;
+      }
+
+      .loading-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 28% 18%, rgba(217, 238, 252, 0.9), transparent 34%),
+          linear-gradient(180deg, #f8fcff 0%, #edf7ff 52%, #fbfdff 100%);
+        color: #27364b;
+        transition: opacity 420ms ease, visibility 420ms ease;
+      }
+
+      .loading-screen.is-leaving {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loading-card {
+        position: relative;
+        width: min(84vw, 420px);
+        border: 1px solid rgba(137, 169, 202, 0.46);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.66);
+        padding: 34px 30px 30px;
+        box-shadow: 0 22px 60px rgba(97, 145, 184, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(14px);
+      }
+
+      .loading-bird {
+        position: absolute;
+        right: 28px;
+        top: -28px;
+        width: 58px;
+        opacity: 0.82;
+        filter: drop-shadow(0 10px 18px rgba(49, 95, 159, 0.16));
+        animation: loading-float 3.2s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .loading-title {
+        margin: 0;
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        font-size: clamp(1.9rem, 8vw, 3.4rem);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1.1;
+      }
+
+      .loading-copy {
+        margin: 12px 0 24px;
+        color: #6f829a;
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+      }
+
+      .loading-progress-track {
+        overflow: hidden;
+        height: 10px;
+        border: 1px solid rgba(137, 169, 202, 0.42);
+        border-radius: 999px;
+        background: rgba(232, 244, 252, 0.82);
+        box-shadow: inset 0 1px 4px rgba(97, 145, 184, 0.12);
+      }
+
+      .loading-progress-bar {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #9bcbea 0%, #c9ddff 48%, #8ee2e6 100%);
+        box-shadow: 0 0 18px rgba(111, 189, 220, 0.58);
+        transition: width 160ms ease-out;
+      }
+
+      .loading-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 12px;
+        color: #6f829a;
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+      }
+
+      @keyframes loading-float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-4deg);
+        }
+
+        50% {
+          transform: translateY(-8px) rotate(2deg);
+        }
+      }
+    </style>
   </head>
-  <body>
+  <body class="loading-lock">
+    <div class="loading-screen" id="loading-screen" role="status" aria-live="polite">
+      <div class="loading-card">
+        <img class="loading-bird" src="assets/portfolio/ui-task-2.png" alt="" aria-hidden="true" />
+        <p class="loading-title">诺米styxia</p>
+        <p class="loading-copy">正在构建你的世界…</p>
+        <div class="loading-progress-track" aria-hidden="true">
+          <div class="loading-progress-bar" id="loading-progress-bar"></div>
+        </div>
+        <div class="loading-meta">
+          <span>Loading world...</span>
+          <span id="loading-progress-text">0%</span>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
+    <script>
+      (() => {
+        const loader = document.getElementById('loading-screen');
+        const bar = document.getElementById('loading-progress-bar');
+        const text = document.getElementById('loading-progress-text');
+
+        if (!loader || !bar || !text) return;
+
+        let progress = 0;
+        let target = 30;
+        let loaded = false;
+        let closed = false;
+
+        const updateProgress = () => {
+          const value = Math.min(100, Math.round(progress));
+          bar.style.width = `${value}%`;
+          text.textContent = `${value}%`;
+        };
+
+        const closeLoader = () => {
+          if (closed) return;
+          closed = true;
+          progress = 100;
+          updateProgress();
+          loader.classList.add('is-leaving');
+          window.setTimeout(() => {
+            loader.remove();
+            document.body.classList.remove('loading-lock');
+          }, 460);
+        };
+
+        const animate = () => {
+          if (closed) return;
+
+          if (loaded && progress >= 95) {
+            closeLoader();
+            return;
+          }
+
+          const distance = target - progress;
+          const easingStep = Math.max(0.08, distance * 0.035);
+          const jitter = Math.random() * 0.28;
+          progress = Math.min(target, progress + easingStep + jitter);
+          updateProgress();
+
+          window.requestAnimationFrame(animate);
+        };
+
+        window.setTimeout(() => {
+          target = Math.max(target, 80);
+        }, 420);
+
+        window.setTimeout(() => {
+          target = Math.max(target, 95);
+        }, 1300);
+
+        window.addEventListener('load', () => {
+          loaded = true;
+          target = 100;
+        });
+
+        window.setTimeout(() => {
+          loaded = true;
+          target = 100;
+        }, 8500);
+
+        updateProgress();
+        window.requestAnimationFrame(animate);
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
