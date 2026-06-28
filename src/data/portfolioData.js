@@ -1,6 +1,6 @@
 export const portfolioData = {
   profile: {
-    displayName: '诺米styxia',
+    displayName: '诺米Styxia',
     role: 'AI-assisted Game Creator',
     subtitle: 'TapTap Maker Developer / Visual Editor Builder / Game UI Creator',
     level: 'Lv.1 Creator',

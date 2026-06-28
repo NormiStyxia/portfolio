@@ -596,17 +596,17 @@ function HeroSection() {
               {profile.note}
             </div>
 
-            <div className="mt-5 flex max-w-2xl flex-wrap gap-2 sm:mt-6">
+            <div className="hero-tool-tags mt-5 flex max-w-2xl flex-wrap gap-2 sm:mt-6">
               {profile.tags.map((tag) => (
-                <span key={tag} className="ui-tag-text rounded-full border border-line/75 bg-white/70 px-3 py-1 text-muted shadow-[0_8px_24px_rgba(97,145,184,0.12)]">
+                <span key={tag} className="hero-tool-tag ui-tag-text">
                   {tag}
                 </span>
               ))}
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-[#6f829a]">
+            <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-[#6f829a] sm:mt-7">
               <span className="caption-text normal-case tracking-[0.08em]">Explore:</span>
-              {[demoAction, editorAction, galleryAction, workflowAction].map((action) => (
+              {[demoAction, editorAction, workflowAction, galleryAction].map((action) => (
                 <a key={action.href} className="hero-explore-link ui-tag-text" href={action.href}>
                   {action.label}
                 </a>

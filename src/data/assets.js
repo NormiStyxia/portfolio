@@ -42,7 +42,7 @@ export const portfolioAssets = {
   },
   heroProfile: {
     avatarPoster: { src: 'assets/portfolio/hero/avatar-poster.png', title: '头像静态封面' },
-    avatar: { src: 'assets/portfolio/hero/avatar.gif', title: '诺米styxia 头像' },
+    avatar: { src: 'assets/portfolio/hero/avatar.gif', title: '诺米Styxia 头像' },
     bottomFlowers: { src: 'assets/portfolio/hero/avatar-flowers-bottom.png', title: '头像下侧花朵装饰' },
     splitBirds: { src: 'assets/portfolio/hero/avatar-birds-split.png', title: '头像两侧飞鸟装饰' },
     cornerBird: { src: 'assets/portfolio/hero/avatar-corner-bird.png', title: '头像左上角白鸟装饰' },
