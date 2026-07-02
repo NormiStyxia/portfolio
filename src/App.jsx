@@ -3,6 +3,7 @@ import { ArrowUpRight, Github, Mail, Maximize2, Mic, Play, Plus, Send, Sparkles,
 import { portfolioAssets } from './data/assets.js';
 import { portfolioData } from './data/portfolioData.js';
 import { SiteHeader } from './components/SiteHeader.jsx';
+import bgCastle from './assets/bg-castle.png';
 
 const sectionClass = 'mx-auto w-full max-w-6xl px-5 sm:px-8';
 const toolHashById = {
@@ -507,10 +508,12 @@ function GameplayVideoFrame({ video, poster, label }) {
           </div>
         )}
       </div>
-      <figcaption className="caption-text flex items-center justify-between px-4 py-3 text-muted">
-        <span>{label}</span>
-        <Play className="video-caption-icon" size={14} fill="currentColor" strokeWidth={1.7} />
-      </figcaption>
+      {label ? (
+        <figcaption className="caption-text flex items-center justify-between px-4 py-3 text-muted">
+          <span>{label}</span>
+          <Play className="video-caption-icon" size={14} fill="currentColor" strokeWidth={1.7} />
+        </figcaption>
+      ) : null}
     </figure>
   );
 }
@@ -552,12 +555,15 @@ function HeroSection() {
 
   return (
     <section id="top" className={`${sectionClass} pt-10 sm:pt-14`}>
+      {/* 1. 保留最外层的大圆角底板与背景装饰 */}
       <div className="relative overflow-hidden rounded-[34px] border border-white/80 bg-gradient-to-br from-white/86 via-shell/76 to-skyglass/56 px-5 py-6 shadow-panel sm:px-8 sm:py-12">
         <img className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.22]" src={frame.src} alt="" aria-hidden="true" decoding="async" />
         <div className="pointer-events-none absolute left-8 top-8 hidden h-16 w-16 rotate-45 border border-white/75 sm:block" />
         <img className="pointer-events-none absolute bottom-8 right-9 hidden w-16 opacity-70 sm:block" src={bird.src} alt="" aria-hidden="true" decoding="async" />
 
         <div className="relative z-10 mx-auto grid max-w-5xl items-center gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:gap-12">
+          
+          {/* 左侧头像区：保持原样 */}
           <div className="relative mx-auto w-full max-w-[230px] sm:max-w-[340px] lg:mx-0">
             <div className="absolute -inset-4 rounded-[36px] bg-skyglass/50 blur-2xl" />
             <div className="relative rotate-[-1.4deg] rounded-[30px] border border-line/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(78,126,168,0.22)] backdrop-blur">
@@ -579,42 +585,69 @@ function HeroSection() {
             </div>
           </div>
 
+          {/* 右侧文本区：轻量化、平面化改造 */}
           <div className="text-left">
             <div className="flex flex-wrap items-center gap-3">
               <p className="caption-text text-muted">CREATOR CARD</p>
-              <span className="ui-tag-text rounded-full border border-line/80 bg-white/78 px-3 py-1 text-[#315f9f] shadow-[0_8px_24px_rgba(97,145,184,0.12)]">
+              {/* 改动：去掉了十字加号，仅保留扁平文本 */}
+              <span className="ui-tag-text flex items-center gap-1.5 text-[#315f9f]">
                 {profile.level}
               </span>
             </div>
+            
             <div className="profile-name-wrap mt-4">
               <span className="profile-corner-star profile-corner-star--left" aria-hidden="true" />
               <h1 className="profile-name text-ink">{profile.displayName}</h1>
               <span className="profile-corner-star profile-corner-star--right" aria-hidden="true" />
             </div>
-            <p className="ui-tag-text mt-3 text-[#4f7897]">{profile.role}</p>
-            <div className="body-text mt-5 max-w-2xl rounded-[22px] border border-line/75 bg-white/64 px-5 py-4 text-[#6f829a] shadow-[0_14px_38px_rgba(97,145,184,0.14)] backdrop-blur">
-              {profile.note}
+            
+            <p className="ui-tag-text mt-3 flex items-center gap-3 text-[#4f7897]">
+              {profile.role}
+              <span className="h-px w-8 bg-[#4f7897]/30" aria-hidden="true" />
+            </p>
+
+            {/* 改动：格言区。去掉了背景竖线，仅保留左侧的星号点缀，并适度调整缩进 */}
+            <div className="relative mt-6 max-w-2xl pl-4 py-1">
+              <span className="absolute left-0 top-0.5 text-[#4f7897]/70 text-sm leading-none" aria-hidden="true">✦</span>
+              <p className="body-text text-[#6f829a] leading-relaxed">
+                {profile.note}
+              </p>
             </div>
 
-            <div className="hero-tool-tags mt-5 flex max-w-2xl flex-wrap gap-2 sm:mt-6">
-              {profile.tags.map((tag) => (
-                <span key={tag} className="hero-tool-tag ui-tag-text">
-                  {tag}
+            {/* 改动：技术 Tag 区。去掉胶囊按钮，改为由 / 分隔的线性文本流 */}
+            <div className="meta-inline-tags mt-6 flex max-w-2xl flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#4f7897]/80 sm:mt-7">
+              <span className="opacity-50" aria-hidden="true">
+                <Plus size={12} strokeWidth={2.5} />
+              </span>
+              {profile.tags.map((tag, index) => (
+                <span key={tag} className="flex items-center gap-3">
+                  <span className="tracking-wide">{tag}</span>
+                  {index < profile.tags.length - 1 ? <span className="text-[#4f7897]/30" aria-hidden="true">/</span> : null}
                 </span>
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-[#6f829a] sm:mt-7">
-              <span className="caption-text normal-case tracking-[0.08em]">Explore:</span>
-              {[demoAction, editorAction, workflowAction, galleryAction].map((action) => (
-                <a key={action.href} className="hero-explore-link ui-tag-text" href={action.href}>
-                  {action.label}
-                </a>
-              ))}
+            {/* 改动：Explore 跳转区。加一条轻微顶部分隔线区分层级，改成悬停带下划线与箭头的文本链 */}
+            <div className="explore-inline-nav mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[#4f7897]/15 pt-5">
+              <span className="caption-text normal-case tracking-[0.08em] text-[#6f829a] flex items-center gap-2">
+                <Sparkles size={14} className="opacity-60" aria-hidden="true" /> Explore:
+              </span>
+              <div className="flex flex-wrap gap-5">
+                {[demoAction, editorAction, workflowAction, galleryAction].map((action) => (
+                  <a key={action.href} className="group relative flex items-center gap-1 text-[#315f9f] font-medium transition-colors hover:text-[#1d417a]" href={action.href}>
+                    <span>{action.label}</span>
+                    <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#315f9f]/40 transition-all group-hover:w-full" aria-hidden="true"></span>
+                    <ArrowUpRight size={14} strokeWidth={2} className="opacity-0 -translate-x-2 translate-y-1 transition-all group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
             </div>
+
           </div>
         </div>
       </div>
+      
+      {/* 底部 Ribbon 按钮保持不变 */}
       <div className="hero-transition-cta">
         <RibbonButton href={projectAction.href} skin={titleRibbon}>
           {projectAction.label}
@@ -638,39 +671,52 @@ function GameDemoSection() {
         </SectionTitle>
       </div>
 
-      <div className="relative z-10">
-        <div className="grid gap-6 lg:grid-cols-[1.32fr_0.68fr]">
-          <Panel className="p-4" id="tapmaker-demo">
-            <GameplayVideoFrame video={gameplayVideo} poster={demoPoster} label="序章实机画面" />
-            <p className="archive-note ui-tag-text mt-4">✦ 开发中记录：《幻界行者·序章》阶段性 Demo，画面、关卡与玩法会持续继续调整。</p>
-          </Panel>
-
-          <Panel className="p-5">
-            <div className="p-4">
-              <div className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-full border border-line/80 bg-white/70 text-[#4f7897]">
-                  <Play size={18} fill="currentColor" />
-                </span>
-                <h3 className="card-title">{mainProject.demo.title}</h3>
-              </div>
-              <p className="body-text mt-4 text-muted">{mainProject.demo.summary}</p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {mainProject.demo.facts.map((fact) => (
-                  <div key={fact.label} className="rounded-2xl border border-line/65 bg-white/58 px-4 py-3 shadow-[0_10px_24px_rgba(97,145,184,0.09)]">
-                    <p className="ui-tag-text text-[#6f829a]">{fact.label}</p>
-                    <p className="ui-button-text mt-1 text-ink">{fact.value}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5">
-                <RibbonButton href={mainProject.demo.href} skin={titleRibbon}>
-                  {mainProject.demo.linkLabel}
-                </RibbonButton>
-              </div>
+      <div className="relative z-10 mt-4">
+        {/* 移除内部卡片嵌套，设定左右宽比约 63% : 37%，自适应高度 items-start */}
+        <div className="grid gap-8 lg:gap-10 lg:grid-cols-[1.75fr_1fr] items-start">
+          
+          {/* 左侧：扁平化视频区 */}
+          <div id="tapmaker-demo" className="flex flex-col gap-4">
+            {/* label=null 使得内部不再渲染底部说明区域，只保留圆角视频 */}
+            <GameplayVideoFrame video={gameplayVideo} poster={demoPoster} label={null} />
+            <div className="flex flex-col gap-1.5 px-2">
+              <p className="ui-tag-text flex items-center gap-1.5 text-[#315f9f]">
+                <Play size={12} fill="currentColor" aria-hidden="true" /> 序章实机画面
+              </p>
+              <p className="text-[13px] text-[#6f829a] leading-relaxed">
+                ✦ 开发中记录：《幻界行者·序章》阶段性 Demo，画面、关卡与玩法会持续继续调整。
+              </p>
             </div>
-          </Panel>
-        </div>
+          </div>
 
+          {/* 右侧：扁平化信息区 */}
+          <div className="flex flex-col lg:pt-2">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#315f9f]/10 text-[#315f9f]" aria-hidden="true">
+                <Play size={10} fill="currentColor" className="ml-0.5" />
+              </span>
+              <h3 className="card-title text-ink text-lg">{mainProject.demo.title}</h3>
+            </div>
+            <p className="body-text mt-3 text-[#6f829a] leading-relaxed">{mainProject.demo.summary}</p>
+            
+            {/* 取消 4 个小圆角卡片，改为扁平两列信息表 */}
+            <div className="mt-6 flex flex-col gap-3.5 border-y border-[#4f7897]/15 py-5">
+              {mainProject.demo.facts.map((fact) => (
+                <div key={fact.label} className="grid grid-cols-[64px_1fr] items-start gap-4">
+                  <span className="text-[13px] font-bold tracking-wide text-[#6f829a]">{fact.label}</span>
+                  <span className="text-[14px] text-ink leading-snug">{fact.value}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-7">
+              <RibbonButton href={mainProject.demo.href} skin={titleRibbon}>
+                {mainProject.demo.linkLabel}
+              </RibbonButton>
+            </div>
+          </div>
+          
+        </div>
       </div>
       <img className="prologue-illustration" src={portfolioAssets.prologueIllustration.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />
     </DecoratedSection>
@@ -727,7 +773,7 @@ function ToolSection() {
       </SectionTitle>
 
       <p className="tool-switch-hint ui-tag-text">✦ 选择一条工具线，查看它如何从 Demo 中生长出来。</p>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 mt-2">
         {tools.map((tool) => (
           <button
             key={tool.id}
@@ -744,71 +790,86 @@ function ToolSection() {
         ))}
       </div>
 
-      <div className="tool-content-panel mt-5" key={activeTool}>
+      <div className="mt-8 relative z-10" key={activeTool}>
         {activeTool === 'editor' ? (
-          <div className="grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
-            <Panel className="p-4">
-              <GameplayVideoFrame video={portfolioAssets.editorShowcaseVideo} poster={editorPoster} label={editor.videoTitle} />
-              <p className="archive-note ui-tag-text mt-4">
-                ✦ 目前编辑器迁移与复用实验已完成，架构说明、设计思路、同步协议和实践经验整理已提交至 TapTap 制造 Skills Hub，供参考交流。
+          <div className="grid gap-8 lg:gap-12 lg:grid-cols-[1.3fr_1fr] items-start">
+            <div className="flex flex-col gap-4">
+              <GameplayVideoFrame video={portfolioAssets.editorShowcaseVideo} poster={editorPoster} label={null} />
+              <div className="px-2">
+                <p className="text-[13px] text-[#6f829a] leading-relaxed">
+                  ✦ 目前编辑器迁移与复用实验已完成，架构说明、设计思路、同步协议和实践经验整理已提交至 TapTap 制造 Skills Hub，供参考交流。
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <p className="caption-text text-[#4f7897] mb-2 flex items-center gap-2">
+                <Wrench size={14} className="opacity-70" /> LEVEL ENGINEERING BREAKDOWN
               </p>
-            </Panel>
+              <h3 className="card-title text-xl text-ink">{editor.videoTitle}</h3>
+              <p className="body-text mt-4 text-[#6f829a] leading-relaxed">{editor.videoSummary}</p>
 
-            <Panel className="p-6">
-              <p className="caption-text text-muted">LEVEL ENGINEERING BREAKDOWN</p>
-              <h3 className="card-title mt-3">{editor.videoTitle}</h3>
-              <p className="body-text mt-4 text-muted">{editor.videoSummary}</p>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {editor.features.map((feature) => (
-                  <span key={feature} className="ui-tag-text rounded-full border border-line/70 bg-white/58 px-3 py-1 text-muted">
-                    {feature}
-                  </span>
-                ))}
+              <div className="mt-6 border-l-2 border-[#315f9f]/20 pl-4 py-1">
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-[14px] text-[#4f7897] font-medium">
+                  {editor.features.map((feature, idx) => (
+                    <span key={feature} className="flex items-center gap-3">
+                      <span>{feature}</span>
+                      {idx < editor.features.length - 1 ? <span className="text-[#315f9f]/30">/</span> : null}
+                    </span>
+                  ))}
+                </div>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-4">
                 <ButtonLink href={editor.href}>{editor.linkLabel}</ButtonLink>
-                <ButtonLink href={editor.postHref} variant="secondary">
+                <a href={editor.postHref} className="ui-button-text flex items-center gap-1.5 text-[#315f9f] hover:text-[#1d417a] transition-colors py-2 px-1 relative group">
                   {editor.postLabel}
-                </ButtonLink>
+                  <ArrowUpRight size={15} strokeWidth={2} className="opacity-50 group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
+                  <span className="absolute bottom-0 left-0 w-full h-px bg-[#315f9f]/30 group-hover:bg-[#315f9f] transition-colors"></span>
+                </a>
               </div>
-            </Panel>
+            </div>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
-            <Panel className="p-6">
-              <p className="caption-text text-muted">AI SYNC WORKFLOW</p>
-              <h3 className="card-title mt-3">让 AI 读懂增量，而不是搬运全量 JSON</h3>
-              <p className="body-text mt-4 text-muted">
+          <div className="grid gap-8 lg:gap-12 lg:grid-cols-[1fr_1.3fr] items-start">
+            <div className="flex flex-col">
+              <p className="caption-text text-[#4f7897] mb-2">AI SYNC WORKFLOW</p>
+              <h3 className="card-title text-xl text-ink">让 AI 读懂增量，而不是搬运全量 JSON</h3>
+              <p className="body-text mt-4 text-[#6f829a] leading-relaxed">
                 我没有把完整关卡 JSON 作为常规同步入口。全量数据本身不是问题，但它太大，每次传输都会增加日志体积、加载时间和 Agent 推理成本，也容易让真正发生的改动被埋在大量状态数据里。
+                <br /><br />
                 因此我通过日志通道导出 AI_SYNC 增量协议：当我对 Agent 说“同步编辑器修改”时，它会从预览日志中读取最新增量改动并写入本地关卡文件，同时自动归档 Diff 与完整 Snapshot，方便后续审查、对照和问题回溯。
               </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {aiTags.map((tag) => (
-                  <span key={tag} className="ui-tag-text rounded-full border border-line/70 bg-white/58 px-3 py-1 text-muted">
-                    {tag}
+              <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#4f7897]/80">
+                <span className="opacity-50"><Plus size={12} strokeWidth={2.5} /></span>
+                {aiTags.map((tag, index) => (
+                  <span key={tag} className="flex items-center gap-3">
+                    <span className="tracking-wide">{tag}</span>
+                    {index < aiTags.length - 1 ? <span className="text-[#4f7897]/30">/</span> : null}
                   </span>
                 ))}
               </div>
-            </Panel>
+            </div>
 
-            <Panel className="p-6">
-              <p className="caption-text text-muted">EVENT TO PATCH</p>
-              <div className="mt-5 grid gap-3">
+            <div className="flex flex-col">
+              <p className="caption-text text-[#4f7897] mb-4">EVENT TO PATCH</p>
+              <div className="flex flex-col divide-y divide-[#4f7897]/15 border-y border-[#4f7897]/15">
                 {[
                   ['Event', '记录编辑器中的原始操作，例如对象选择、属性修改、节点连接与配置变化。'],
                   ['Intent', '将原始操作整理成更接近“用户意图”的语义改动，让 Agent 关注要改什么，而不是猜完整 JSON 结构。'],
                   ['Patch', '把语义改动编译成可执行的增量补丁，只同步真正发生变化的部分。'],
                   ['Diff / Snapshot', 'Diff 用来把改动列表直观呈现给开发者，方便人工对照；Snapshot 则作为完整快照归档，在协议压缩或字段裁剪出现问题时用于恢复和排查。'],
-                ].map(([title, detail]) => (
-                  <div key={title} className="rounded-2xl border border-line/65 bg-white/58 px-4 py-3">
-                    <p className="ui-button-text text-ink">{title}</p>
-                    <p className="body-text mt-1 text-muted">{detail}</p>
+                ].map(([title, detail], idx) => (
+                  <div key={title} className="grid grid-cols-[100px_1fr] items-start gap-4 py-4">
+                    <div className="flex items-center gap-2">
+                       <span className="text-[10px] font-bold text-[#315f9f]/40">0{idx + 1}</span>
+                       <span className="text-[14px] font-bold text-[#315f9f] tracking-wide">{title}</span>
+                    </div>
+                    <p className="text-[14px] text-[#6f829a] leading-snug">{detail}</p>
                   </div>
                 ))}
               </div>
-            </Panel>
+            </div>
           </div>
         )}
       </div>
@@ -913,8 +974,10 @@ function ProcessSection() {
   return (
     <DecoratedSection id="process" type="process">
       <div className="process-scene">
-        <p className="caption-text text-muted">项目演化 / The First Prompt</p>
-        <p className="process-prompt__hint">最开始，没有编辑器，也没有流程，只有一个想做游戏的念头……</p>
+        <p className="caption-text text-muted mb-2">项目演化 / The First Prompt</p>
+        <p className="body-text text-[#6f829a] mb-6">最开始，没有编辑器，也没有流程，只有一个想做游戏的念头……</p>
+        
+        {/* 还原被误删的 AI 对话框效果 */}
         <div className="process-prompt">
           <p className="process-prompt__question">你想做一个什么样的游戏？</p>
           <div className="process-prompt__input">
@@ -935,15 +998,27 @@ function ProcessSection() {
             </span>
           </div>
         </div>
-        <div className="process-steps grid gap-3 md:grid-cols-4">
-          {process.map((step, index) => (
-            <div key={step.title} className="process-step-card relative">
-              <div className="ui-tag-text text-[#4f7897]">{String(index + 1).padStart(2, '0')}</div>
-              <h3 className="card-title mt-2 text-ink">{step.title}</h3>
-              <p className="body-text mt-2 text-muted">{step.detail}</p>
-              {index < process.length - 1 ? <span className="ui-tag-text absolute -right-3 top-1/2 hidden -translate-y-1/2 text-skyglass md:block">→</span> : null}
-            </div>
-          ))}
+        
+        {/* 步骤流：继续保持扁平化的时间轴设计 */}
+        <div className="relative mt-8">
+          <div className="hidden md:block absolute top-[14px] left-0 w-full h-px bg-gradient-to-r from-[#315f9f]/10 via-[#315f9f]/30 to-transparent" aria-hidden="true" />
+          
+          <div className="grid gap-8 md:gap-4 md:grid-cols-4">
+            {process.map((step, index) => (
+              <div key={step.title} className="relative pt-0 md:pt-10">
+                <div className="hidden md:flex absolute top-0 left-0 h-[28px] w-[28px] items-center justify-center rounded-full border-[2px] border-mist bg-white shadow-sm text-[11px] font-bold text-[#315f9f]">
+                  {String(index + 1).padStart(2, '0')}
+                </div>
+                
+                <div className="md:hidden mb-2 text-[11px] font-bold text-[#315f9f]/60 tracking-wider">
+                  STEP {String(index + 1).padStart(2, '0')}
+                </div>
+
+                <h3 className="card-title text-[16px] text-ink">{step.title}</h3>
+                <p className="body-text mt-3 text-[#6f829a] leading-relaxed">{step.detail}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </DecoratedSection>
@@ -968,47 +1043,36 @@ function ContactSection() {
 
   return (
     <DecoratedSection id="contact" type="soft" className="pb-16 pt-12" showBird>
-      <Panel className="contact-panel overflow-hidden p-6 sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="relative">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] items-center">
           <div>
-            <p className="caption-text text-muted">联系</p>
-            <div className="section-title-wrap mt-3">
-              <span className="section-corner-star section-corner-star--left" aria-hidden="true" />
-              <h2 className="section-title text-ink">如何找到我？</h2>
-              <span className="section-corner-star section-corner-star--right" aria-hidden="true" />
-            </div>
-            <p className="body-text mt-4 text-muted">
+            <p className="caption-text text-muted mb-2">联系</p>
+            <h2 className="section-title text-ink">如何找到我？</h2>
+            <p className="body-text mt-5 text-[#6f829a] leading-relaxed max-w-lg">
               对我的作品感兴趣？想和我交流 AI 游戏创作？寻找 Game Jam 队友？还是单纯想找我聊天？想认识我的话，呐。Sir，this way！
             </p>
           </div>
-          <div className="contact-links-grid relative z-10 grid gap-3 sm:grid-cols-2">
+          
+          <div className="relative z-20 grid gap-4 sm:grid-cols-2">
             {links.map(({ label, href, icon: Icon, copy }) => {
               const className =
-                'contact-link-card ui-button-text flex min-h-16 items-center gap-3 rounded-2xl border border-line/70 bg-shell/60 px-4 py-3 text-left text-ink';
+                'group flex items-center gap-4 py-4 px-2 border-b border-[#4f7897]/20 text-ink hover:border-[#315f9f] transition-colors bg-mist/40 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none';
 
               return copy ? (
                 <button key="email-copy" className={className} onClick={handleEmailCopy} type="button">
-                  <Icon size={18} className="shrink-0 text-[#4f7897]" />
-                  <span className="min-w-0 truncate">{label}</span>
+                  <Icon size={18} className="shrink-0 text-[#315f9f] group-hover:scale-110 transition-transform" strokeWidth={1.8} />
+                  <span className="min-w-0 truncate font-medium text-[15px]">{label}</span>
                 </button>
               ) : (
                 <a key={label} className={className} href={href} {...externalLinkProps(href)}>
-                  <Icon size={18} className="shrink-0 text-[#4f7897]" />
-                  <span className="min-w-0 truncate">{label}</span>
+                  <Icon size={18} className="shrink-0 text-[#315f9f] group-hover:scale-110 transition-transform" strokeWidth={1.8} />
+                  <span className="min-w-0 truncate font-medium text-[15px]">{label}</span>
                 </a>
               );
             })}
           </div>
         </div>
-        <LazyImage
-          animated
-          className="contact-mascot"
-          src={portfolioAssets.contactMascot.src}
-          poster={portfolioAssets.contactMascot.poster}
-          alt=""
-          aria-hidden="true"
-        />
-      </Panel>
+      </div>
     </DecoratedSection>
   );
 }
@@ -1023,8 +1087,27 @@ function ContinuationDivider() {
 
 export default function App() {
   return (
-    <main className="min-h-screen overflow-hidden bg-mist text-ink">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(216,236,250,0.78),transparent_28%),linear-gradient(180deg,#f8fcff_0%,#edf7ff_48%,#f9fbff_100%)]" />
+    <main className="min-h-screen overflow-hidden text-ink relative">
+      {/* 0. 垫底颜色，替代原本的 bg-mist */}
+      <div className="fixed inset-0 -z-30 bg-mist pointer-events-none" />
+
+      {/* 1. 最底层：城堡背景图。 */}
+      <div className="fixed inset-0 -z-20 pointer-events-none">
+        <img
+          src={bgCastle}
+          alt=""
+          className="h-full w-full object-cover object-bottom opacity-60 mix-blend-multiply"
+          style={{
+            maskImage: 'linear-gradient(to bottom, transparent 10%, black 50%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 10%, black 50%)',
+          }}
+        />
+      </div>
+
+      {/* 2. 中间层：保留页面原本的浅色氛围与遮罩 */}
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(216,236,250,0.5),transparent_40%),linear-gradient(180deg,rgba(248,252,255,0.8)_0%,rgba(237,247,255,0.6)_48%,rgba(249,251,255,0.4)_100%)] pointer-events-none" />
+
+      {/* 3. 上层：各个内容卡片模块 */}
       <SiteHeader name={portfolioData.profile.displayName} />
       <HeroSection />
       <GameDemoSection />
@@ -1033,6 +1116,18 @@ export default function App() {
       <ProcessSection />
       <ContinuationDivider />
       <ContactSection />
+      
+      {/* 4. 将小人 Mascot 移动到整个网页的最末尾，作为页面收尾的点缀 */}
+      <div className={`${sectionClass} pb-24 flex justify-end`}>
+        <LazyImage
+          animated
+          className="w-48 sm:w-64 opacity-80"
+          src={portfolioAssets.contactMascot.src}
+          poster={portfolioAssets.contactMascot.poster}
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
     </main>
   );
 }
