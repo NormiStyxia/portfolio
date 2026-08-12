@@ -59,7 +59,7 @@
   --duration-slow: 420ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --shell-max: 90rem;
-  --content-max: 80rem;
+  --shell-max: 75rem;
+  --content-max: 68rem;
   --reading-max: 40em;
 }
