@@ -43,7 +43,7 @@ function ProjectLinks({ project }) {
 
   return (
     <div className="project-links">
-      {project.links.caseStudy ? <ArrowLink href={project.links.caseStudy}>Case Study</ArrowLink> : null}
+      {project.links.caseStudy ? <ArrowLink href={project.links.caseStudy}>查看案例</ArrowLink> : null}
       {project.links.demo ? <ArrowLink href={project.links.demo} external>Demo</ArrowLink> : null}
       {project.links.tapTap ? (
         <ArrowLink href={project.links.tapTap} external>
@@ -191,7 +191,7 @@ function App() {
           </div>
 
           <div className="hero__actions">
-            <ArrowLink href="#selected-works">Selected Works</ArrowLink>
+            <ArrowLink href="#selected-works">代表作品</ArrowLink>
           </div>
 
           <div className="hero__socials" aria-label="外部链接">
@@ -204,9 +204,9 @@ function App() {
 
         <section className="selected-works shell" id="selected-works" aria-labelledby="selected-title">
           <header className="section-intro">
-            <p className="eyebrow">01—04 / Selected</p>
-            <h2 id="selected-title">Selected Works</h2>
-            <p>四个不等权项目，分别证明规则设计、AI-native 系统、视觉技术统一与能力演化。</p>
+            <p className="eyebrow">01–04 / SELECTED</p>
+            <h2 id="selected-title">代表作品</h2>
+            <p>四个不同阶段与方向的项目，分别展示规则设计、AI-native 系统、程序化视觉与工具链探索。</p>
           </header>
 
           <FlagshipProject project={newton} />
@@ -219,8 +219,8 @@ function App() {
           <div className="shell">
             <header className="section-intro section-intro--tools">
               <p className="eyebrow">Infrastructure / Cross-project</p>
-              <h2 id="tools-title">Tools &amp; Workflow</h2>
-              <p>The infrastructure behind the games.</p>
+              <h2 id="tools-title">工具与工作流</h2>
+              <p>支撑这些游戏持续迭代的基础设施。</p>
             </header>
 
             <div className="tools-list">
@@ -230,7 +230,7 @@ function App() {
                   <h3>{tool.title}</h3>
                   <p>{tool.detail}</p>
                   <p className="tool-row__used">
-                    <span>Used in</span>
+                    <span>应用于</span>
                     {tool.usedIn}
                   </p>
                 </article>
@@ -242,7 +242,7 @@ function App() {
         <section className="about shell" id="about" aria-labelledby="about-title">
           <div className="about__heading">
             <p className="eyebrow">About / Contact</p>
-            <h2 id="about-title">Make the rules.<br />Build the tools.</h2>
+            <h2 id="about-title">关于</h2>
           </div>
           <div className="about__copy">
             {site.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -265,7 +265,7 @@ function App() {
         <div className="shell site-footer__inner">
           <p>NormiStyxia / Game Design Portfolio</p>
           <p>Games / Tools / AI-native workflows</p>
-          <a href="#top">Back to top ↑</a>
+          <a href="#top">返回顶部 ↑</a>
         </div>
       </footer>
     </div>

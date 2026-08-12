@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
 const navigationItems = [
-  { label: 'Selected Works', href: '#selected-works' },
-  { label: 'Tools', href: '#tools' },
-  { label: 'About', href: '#about' },
+  { label: '代表作品', href: '#selected-works' },
+  { label: '工具与工作流', href: '#tools' },
+  { label: '关于', href: '#about' },
 ];
 
 export function GlobalNavigation({ name }) {
@@ -43,7 +43,7 @@ export function GlobalNavigation({ name }) {
           aria-controls="mobile-navigation"
           onClick={() => setIsOpen((value) => !value)}
         >
-          <span>{isOpen ? 'Close' : 'Menu'}</span>
+          <span>{isOpen ? '关闭' : '菜单'}</span>
           <span className="menu-button__icon" aria-hidden="true">
             <i />
             <i />

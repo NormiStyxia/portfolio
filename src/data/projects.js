@@ -100,7 +100,7 @@ export const projects = [
     role: ['Game Design', 'Visual Design', 'Programmatic Visual'],
     platform: 'TapTap Maker',
     summary: '放置 Echo、换位与同步，把角色过去的位置变成解谜中的几何支点。',
-    coreIdea: 'Echo mechanics × geometry × programmatic visual。',
+    coreIdea: 'Echo 机制 × 几何变换 × 程序化视觉。',
     contributions: ['Echo 放置与换位', '几何平台谜题', '红黑白程序化视觉'],
     accent: '#963C3C',
     heroMedia: {
@@ -156,25 +156,25 @@ export const tools = [
   {
     index: '02',
     title: 'Event → Intent → Patch',
-    detail: 'Incremental Agent Workflow',
-    usedIn: 'Across projects',
+    detail: '增量 Agent 工作流',
+    usedIn: '跨项目',
   },
   {
     index: '03',
     title: 'Level Data Schema',
-    detail: 'LLM-readable level structure',
+    detail: 'LLM 可读的关卡数据结构',
     usedIn: 'Anchor Maze / NEWTONignore',
   },
   {
     index: '04',
     title: 'Standard Solution / Replay',
-    detail: 'State-aware guidance and recovery',
+    detail: '基于状态的提示与防卡关',
     usedIn: 'Anchor Maze / NEWTONignore',
   },
   {
     index: '05',
     title: 'UGC / Cloud Draft',
-    detail: 'Creation infrastructure',
+    detail: '创作基础设施',
     usedIn: 'NEWTONignore',
   },
 ];
