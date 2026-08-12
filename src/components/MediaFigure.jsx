@@ -31,7 +31,7 @@ export function MediaFigure({ media, className = '' }) {
           width={media.width}
           height={media.height}
         >
-          <source src={media.src} />
+          <source src={media.src} type="video/mp4" />
         </video>
       );
     }

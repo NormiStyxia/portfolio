@@ -664,14 +664,6 @@ button {
   padding-top: clamp(2rem, 5vw, 4rem);
 }
 
-.project-media--archive .media-figure__frame {
-  aspect-ratio: 4 / 3 !important;
-}
-
-.project-media--archive img {
-  object-position: 45% center;
-}
-
 .project--archive h3 {
   font-size: clamp(2.6rem, 5vw, 5.5rem);
   line-height: 0.94;
@@ -1194,10 +1186,6 @@ button {
   .archive-grid {
     gap: 2rem;
     align-items: stretch;
-  }
-
-  .project-media--archive .media-figure__frame {
-    aspect-ratio: 16 / 10 !important;
   }
 
   .tool-row {
