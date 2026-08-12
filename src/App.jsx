@@ -73,17 +73,20 @@ function FlagshipProject({ project }) {
         <p className="project-core">{project.coreIdea}</p>
       </div>
 
-      <ProjectMeta project={project} />
-      <MediaFigure media={project.heroMedia} className="project-media project-media--flagship" />
-
-      <div className="project-evidence">
-        <p>{project.summary}</p>
-        <ol>
-          {project.contributions.map((contribution) => (
-            <li key={contribution}>{contribution}</li>
-          ))}
-        </ol>
-        <ProjectLinks project={project} />
+      <div className="project-main project-main--flagship">
+        <MediaFigure media={project.heroMedia} className="project-media project-media--flagship" />
+        <div className="project-sidebar">
+          <ProjectMeta project={project} />
+          <div className="project-evidence">
+            <p>{project.summary}</p>
+            <ol>
+              {project.contributions.map((contribution) => (
+                <li key={contribution}>{contribution}</li>
+              ))}
+            </ol>
+            <ProjectLinks project={project} />
+          </div>
+        </div>
       </div>
     </article>
   );
@@ -137,6 +140,7 @@ function ArchiveProject({ project }) {
           <h3>{project.title}</h3>
           <p className="project-core">{project.coreIdea}</p>
           <p>{project.summary}</p>
+          <ProjectMeta project={project} />
           <ul className="archive-list">
             {project.contributions.map((contribution) => (
               <li key={contribution}>{contribution}</li>
