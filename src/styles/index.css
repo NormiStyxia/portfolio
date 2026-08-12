@@ -221,7 +221,8 @@ button {
   border-bottom: 1px solid var(--color-border-subtle);
   padding: 0.8rem 0;
   font-size: clamp(1.05rem, 1.6vw, 1.5rem);
-  line-height: 1.25;
+  letter-spacing: 0.02em;
+  line-height: 1.32;
 }
 
 .hero__roles span {
@@ -240,6 +241,7 @@ button {
   max-width: 27rem;
   margin: 0;
   font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+  letter-spacing: 0.015em;
   line-height: 1.7;
 }
 
@@ -251,6 +253,7 @@ button {
 
 .hero__practice p {
   margin: 0;
+  letter-spacing: 0.015em;
 }
 
 .hero__practice p:first-child {

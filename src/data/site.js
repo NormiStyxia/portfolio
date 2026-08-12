@@ -1,6 +1,6 @@
 export const site = {
   name: 'NormiStyxia',
-  roles: ['AI Game Creator', 'Game Designer'],
+  roles: ['AI 游戏创作者', '游戏设计师'],
   avatar: `${import.meta.env.BASE_URL}assets/portfolio/hero/creator-avatar.gif`,
   motto: '在还不熟悉世界的规则时，我先试着把自己的世界搭起来。',
   whatIDo: {
