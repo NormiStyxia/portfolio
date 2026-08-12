@@ -1,6 +1,6 @@
 import { GlobalNavigation } from './components/GlobalNavigation.jsx';
 import { MediaFigure } from './components/MediaFigure.jsx';
-import { projects, tools } from './data/projects.js';
+import { projects } from './data/projects.js';
 import { site } from './data/site.js';
 
 const externalProps = {
@@ -165,7 +165,7 @@ function App() {
           <img
             className="hero__avatar"
             src={site.avatar}
-            alt="NormiStyxia 蓝白角色创作者头像"
+            alt="诺米Styxia 蓝白角色创作者头像"
             width="800"
             height="800"
             decoding="async"
@@ -194,18 +194,11 @@ function App() {
             <ArrowLink href="#selected-works">代表作品</ArrowLink>
           </div>
 
-          <div className="hero__socials" aria-label="外部链接">
-            <ArrowLink href={site.contact.github} external>GitHub</ArrowLink>
-            <ArrowLink href={site.contact.tapTap} external>TapTap</ArrowLink>
-            <ArrowLink href={`mailto:${site.contact.email}`}>Contact</ArrowLink>
-          </div>
-
         </section>
 
-        <section className="selected-works shell" id="selected-works" aria-labelledby="selected-title">
+        <section className="selected-works shell" id="selected-works" aria-label="代表作品">
           <header className="section-intro">
             <p className="eyebrow">01–04 / SELECTED</p>
-            <h2 id="selected-title">代表作品</h2>
             <p>四个不同阶段与方向的项目，分别展示规则设计、AI-native 系统、程序化视觉与工具链探索。</p>
           </header>
 
@@ -213,30 +206,6 @@ function App() {
           <SecondaryProject project={anchor} />
           <SecondaryProject project={crimson} reverse />
           <ArchiveProject project={archive} />
-        </section>
-
-        <section className="tools-section" id="tools" aria-labelledby="tools-title">
-          <div className="shell">
-            <header className="section-intro section-intro--tools">
-              <p className="eyebrow">Infrastructure / Cross-project</p>
-              <h2 id="tools-title">工具与工作流</h2>
-              <p>支撑这些游戏持续迭代的基础设施。</p>
-            </header>
-
-            <div className="tools-list">
-              {tools.map((tool) => (
-                <article className="tool-row" key={tool.index}>
-                  <span className="tool-row__index">{tool.index}</span>
-                  <h3>{tool.title}</h3>
-                  <p>{tool.detail}</p>
-                  <p className="tool-row__used">
-                    <span>应用于</span>
-                    {tool.usedIn}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
         </section>
 
         <section className="about shell" id="about" aria-labelledby="about-title">
@@ -263,7 +232,7 @@ function App() {
 
       <footer className="site-footer">
         <div className="shell site-footer__inner">
-          <p>NormiStyxia / Game Design Portfolio</p>
+          <p>诺米Styxia / Game Design Portfolio</p>
           <p>Games / Tools / AI-native workflows</p>
           <a href="#top">返回顶部 ↑</a>
         </div>

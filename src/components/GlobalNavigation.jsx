@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 const navigationItems = [
   { label: '代表作品', href: '#selected-works' },
-  { label: '工具与工作流', href: '#tools' },
   { label: '关于', href: '#about' },
 ];
 

@@ -35,6 +35,7 @@
 
   --font-sans: Inter, "LeMi MuHe Yuan", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-display: "Arial Narrow", "Roboto Condensed", "Chill HuoSong", "Noto Sans SC", sans-serif;
+  --font-brand: "Arial Narrow", "Roboto Condensed", "LeMi MuHe Yuan", "Noto Sans SC", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
   --radius-sm: 3px;
