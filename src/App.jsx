@@ -234,7 +234,7 @@ function App() {
         <section className="about shell" id="about" aria-labelledby="about-title">
           <div className="about__heading">
             <p className="eyebrow">About / Contact</p>
-            <h2 id="about-title">关于</h2>
+            <h2 id="about-title">关于我</h2>
           </div>
           <div className="about__copy">
             {site.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
