@@ -831,7 +831,7 @@ button {
   .section-intro {
     position: absolute;
     z-index: 1;
-    top: clamp(1.2rem, 2.8svh, 2rem);
+    top: clamp(0.9rem, 2.4svh, 1.8rem);
     right: 0;
     left: 0;
     align-items: start;
