@@ -7,7 +7,7 @@ export const companionIntroDialogue = {
     '如果我挡到你看文本了，把我拎起来往边上挪挪就好。',
   ],
   showProjectNavigation: false,
-  autoAdvance: true,
+  autoAdvance: false,
 };
 
 export const companionDialogue = {
