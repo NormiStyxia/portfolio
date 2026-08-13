@@ -67,13 +67,13 @@
   }
 }
 
-/* Hero reveal begins only after the loader starts its exit. */
-.portfolio-app[data-bootstrap='loading'] .hero .eyebrow,
-.portfolio-app[data-bootstrap='loading'] .hero__avatar,
-.portfolio-app[data-bootstrap='loading'] .hero__roles p,
-.portfolio-app[data-bootstrap='loading'] .hero__motto > p:last-child,
-.portfolio-app[data-bootstrap='loading'] .hero__practice p,
-.portfolio-app[data-bootstrap='loading'] .hero__actions {
+/* Hero uses the same active-section replay lifecycle as the project sections. */
+.hero.motion-section:not(.is-revealed) .eyebrow,
+.hero.motion-section:not(.is-revealed) .hero__avatar,
+.hero.motion-section:not(.is-revealed) .hero__roles p,
+.hero.motion-section:not(.is-revealed) .hero__motto > p:last-child,
+.hero.motion-section:not(.is-revealed) .hero__practice p,
+.hero.motion-section:not(.is-revealed) .hero__actions {
   opacity: 0;
   transform: translateY(6px);
 }
@@ -92,7 +92,7 @@
   transition: clip-path 680ms var(--ease-out);
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero h1 {
+.hero.motion-section.is-revealed h1 {
   clip-path: inset(-0.2em -0.22em -0.22em -0.18em);
   transition-delay: 80ms;
 }
@@ -101,7 +101,7 @@
   clip-path: inset(0 0 100% 0);
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero__avatar {
+.hero.motion-section.is-revealed .hero__avatar {
   clip-path: inset(0 0 0 0);
   transition-delay: 150ms;
 }
@@ -154,37 +154,37 @@
   letter-spacing: inherit;
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p,
-.portfolio-app:not([data-bootstrap='loading']) .hero__motto > p:last-child,
-.portfolio-app:not([data-bootstrap='loading']) .hero__practice p,
-.portfolio-app:not([data-bootstrap='loading']) .hero__actions,
-.portfolio-app:not([data-bootstrap='loading']) .hero .eyebrow {
+.hero.motion-section.is-revealed .hero__roles p,
+.hero.motion-section.is-revealed .hero__motto > p:last-child,
+.hero.motion-section.is-revealed .hero__practice p,
+.hero.motion-section.is-revealed .hero__actions,
+.hero.motion-section.is-revealed .eyebrow {
   opacity: 1;
   transform: translateY(0);
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p::before,
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p::after {
+.hero.motion-section.is-revealed .hero__roles p::before,
+.hero.motion-section.is-revealed .hero__roles p::after {
   transform: scaleX(1);
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p > span {
+.hero.motion-section.is-revealed .hero__roles p > span {
   opacity: 1;
   transform: translateY(0);
 }
 
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1) > span:first-child { transition-delay: 130ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1) .hero__role-label { transition-delay: 180ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1)::before,
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1)::after { transition-delay: 205ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2) > span:first-child { transition-delay: 210ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2) .hero__role-label { transition-delay: 260ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2)::after { transition-delay: 285ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__motto > .eyebrow { transition-delay: 225ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__motto > p:last-child { transition-delay: 285ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__practice p:first-child { transition-delay: 330ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__practice p:last-child { transition-delay: 410ms; }
-.portfolio-app:not([data-bootstrap='loading']) .hero__actions { transition-delay: 450ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(1) > span:first-child { transition-delay: 130ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(1) .hero__role-label { transition-delay: 180ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(1)::before,
+.hero.motion-section.is-revealed .hero__roles p:nth-child(1)::after { transition-delay: 205ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(2) > span:first-child { transition-delay: 210ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(2) .hero__role-label { transition-delay: 260ms; }
+.hero.motion-section.is-revealed .hero__roles p:nth-child(2)::after { transition-delay: 285ms; }
+.hero.motion-section.is-revealed .hero__motto > .eyebrow { transition-delay: 225ms; }
+.hero.motion-section.is-revealed .hero__motto > p:last-child { transition-delay: 285ms; }
+.hero.motion-section.is-revealed .hero__practice p:first-child { transition-delay: 330ms; }
+.hero.motion-section.is-revealed .hero__practice p:last-child { transition-delay: 410ms; }
+.hero.motion-section.is-revealed .hero__actions { transition-delay: 450ms; }
 
 .arrow-link {
   position: relative;
@@ -223,7 +223,7 @@
   transform: translateX(4px);
 }
 
-/* Shared one-shot reveal. Body copy remains a single reading unit. */
+/* Shared active-section reveal. Leaving keeps the final state; re-entry resets once. */
 .section-intro .eyebrow,
 .section-intro > p:last-child,
 .motion-section .project-rule > span,
