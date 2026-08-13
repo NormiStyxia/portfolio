@@ -18,24 +18,26 @@ function ArrowLink({ href, children, external = false }) {
 }
 
 function ProjectMeta({ project }) {
+  const labels = project.metaLabels || {};
+
   return (
     <dl className="project-meta">
       <div>
-        <dt>Role</dt>
+        <dt>{labels.role || 'Role'}</dt>
         <dd>{project.role.join(' / ')}</dd>
       </div>
       <div>
-        <dt>Duration</dt>
-        <dd>{project.duration}</dd>
+        <dt>{labels.duration || 'Duration'}</dt>
+        <dd>{project.metaDuration || project.duration}</dd>
       </div>
       {project.engine ? (
         <div>
-          <dt>Engine</dt>
+          <dt>{labels.engine || 'Engine'}</dt>
           <dd>{project.engine}</dd>
         </div>
       ) : null}
       <div>
-        <dt>Context</dt>
+        <dt>{labels.context || 'Context'}</dt>
         <dd>{project.context || project.platform || project.year}</dd>
       </div>
     </dl>
@@ -94,11 +96,11 @@ function FlagshipProject({ project }) {
 }
 
 function SecondaryProject({ project, reverse = false }) {
-  const isAnchorMaze = project.id === 'anchor-maze';
+  const hasDesignNote = project.id === 'anchor-maze' || project.id === 'crimson-leap';
 
   return (
     <article
-      className={`project project--secondary ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${reverse ? 'project--reverse' : ''}`}
+      className={`project project--secondary ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${project.id === 'crimson-leap' ? 'project--crimson' : ''} ${reverse ? 'project--reverse' : ''}`}
       id={project.id}
       style={{ '--project-accent': project.accent }}
     >
@@ -116,7 +118,7 @@ function SecondaryProject({ project, reverse = false }) {
           </h3>
           <p className="project-core">{project.coreIdea}</p>
           <ProjectMeta project={project} />
-          {isAnchorMaze ? (
+          {hasDesignNote ? (
             <p className="design-note">{project.summary}</p>
           ) : (
             <ul className="contribution-list">
