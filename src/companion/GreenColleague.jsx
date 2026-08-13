@@ -189,6 +189,7 @@ export function GreenColleague({ currentSection, sectionTargets, projectAnchors 
   const seenCountRef = useRef(introInitiallySeenRef.current ? { hero: 1 } : {});
   const pointerRef = useRef(null);
   const suppressClickRef = useRef(false);
+  const previousSectionRef = useRef(currentSection);
   const [dialogue, setDialogue] = useState(null);
   const [introPhase, setIntroPhase] = useState(
     introInitiallySeenRef.current ? INTRO_COMPLETE : INTRO_IDLE,
@@ -316,6 +317,17 @@ export function GreenColleague({ currentSection, sectionTargets, projectAnchors 
     setIntroPhase(INTRO_DIALOGUE);
     setDialogue(companionIntroDialogue);
   }, []);
+
+  useEffect(() => {
+    if (!locomotionReady || introPhase !== INTRO_IDLE || dialogue !== null) return;
+    startIntro();
+  }, [dialogue, introPhase, locomotionReady, startIntro]);
+
+  useEffect(() => {
+    if (previousSectionRef.current === currentSection) return;
+    previousSectionRef.current = currentSection;
+    if (dialogue !== null) closeDialogue();
+  }, [closeDialogue, currentSection, dialogue]);
 
   const openDialogue = () => {
     setAmbientClipName(null);
