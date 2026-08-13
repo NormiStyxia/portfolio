@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PortfolioLoader } from './bootstrap/PortfolioLoader.jsx';
 import { GlobalNavigation } from './components/GlobalNavigation.jsx';
 import { MediaFigure } from './components/MediaFigure.jsx';
@@ -23,6 +23,42 @@ const externalProps = {
   target: '_blank',
   rel: 'noreferrer',
 };
+
+function HeroAvatar({ animatedSrc, posterSrc, animate }) {
+  const [src, setSrc] = useState(posterSrc || animatedSrc);
+
+  useEffect(() => {
+    if (!animate || !animatedSrc || animatedSrc === posterSrc) return undefined;
+
+    let active = true;
+    const image = new Image();
+    image.decoding = 'async';
+    image.addEventListener('load', async () => {
+      try {
+        await image.decode();
+      } catch {
+        // The loaded GIF can still replace its stable poster without changing layout.
+      }
+      if (active) setSrc(animatedSrc);
+    }, { once: true });
+    image.src = animatedSrc;
+
+    return () => {
+      active = false;
+    };
+  }, [animate, animatedSrc, posterSrc]);
+
+  return (
+    <img
+      className="hero__avatar"
+      src={src}
+      alt="诺米Styxia 蓝白角色创作者头像"
+      width="800"
+      height="800"
+      decoding="async"
+    />
+  );
+}
 
 function ArrowLink({ href, children, external = false }) {
   return (
@@ -183,7 +219,7 @@ function App() {
     <div className="portfolio-app" data-bootstrap={bootstrapPhase}>
       {bootstrapPhase !== 'ready' ? (
         <PortfolioLoader
-          heroImage={site.avatar}
+          heroImage={site.avatarPoster}
           firstMedia={newton.heroMedia}
           onReveal={revealPortfolio}
           onComplete={completeBootstrap}
@@ -199,13 +235,10 @@ function App() {
               <h1 id="hero-title">{site.name}</h1>
             </div>
 
-          <img
-            className="hero__avatar"
-            src={site.avatar}
-            alt="诺米Styxia 蓝白角色创作者头像"
-            width="800"
-            height="800"
-            decoding="async"
+          <HeroAvatar
+            animatedSrc={site.avatar}
+            posterSrc={site.avatarPoster}
+            animate={bootstrapPhase !== 'loading'}
           />
 
           <div className="hero__roles" aria-label="专业方向">

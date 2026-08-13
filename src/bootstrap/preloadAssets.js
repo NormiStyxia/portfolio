@@ -59,17 +59,8 @@ async function loadPortfolioFonts() {
   await document.fonts.ready;
 }
 
-async function prepareCompanionAssets() {
-  await Promise.allSettled([
-    preloadCompanionClip('idle'),
-    preloadCompanionClip('move'),
-    preloadCompanionClip('tapReactA'),
-    preloadCompanionClip('tapReactB'),
-  ]);
-}
-
-async function prepareCompanionRuntime() {
-  await preloadCompanionClip('idle');
+async function prepareCompanionRuntime(assetPromises) {
+  await Promise.allSettled(assetPromises);
   const requiredClips = ['idle', 'move', 'tapReactA', 'tapReactB'];
   const invalidClip = requiredClips.find((name) => !companionClips[name]?.frames?.length);
   if (invalidClip) throw new Error(`Companion clip unavailable: ${invalidClip}`);
@@ -95,23 +86,34 @@ async function waitForStableLayout(dependencies) {
 export async function bootstrapPortfolio({ heroImage, firstMedia, onProgress }) {
   const fontsReady = loadPortfolioFonts();
   const heroAssetsReady = decodeImage(heroImage);
-  const companionAssetsReady = prepareCompanionAssets();
-  const companionRuntimeReady = prepareCompanionRuntime();
-  const firstMediaReady = Promise.allSettled([
-    decodeImage(firstMedia?.poster),
-    loadVideoMetadata(firstMedia),
+  const companionIdleReady = preloadCompanionClip('idle');
+  const companionWalkReady = preloadCompanionClip('move');
+  const companionClickAReady = preloadCompanionClip('tapReactA');
+  const companionClickBReady = preloadCompanionClip('tapReactB');
+  const companionRuntimeReady = prepareCompanionRuntime([
+    companionIdleReady,
+    companionWalkReady,
+    companionClickAReady,
+    companionClickBReady,
   ]);
+  const firstPosterReady = decodeImage(firstMedia?.poster);
+  const firstMediaReady = loadVideoMetadata(firstMedia);
   const layoutReady = waitForStableLayout([
     fontsReady,
     heroAssetsReady,
+    firstPosterReady,
     firstMediaReady,
   ]);
 
   const checkpoints = [
     ['fontsReady', fontsReady],
     ['heroAssetsReady', heroAssetsReady],
-    ['companionAssetsReady', companionAssetsReady],
+    ['companionIdleReady', companionIdleReady],
+    ['companionWalkReady', companionWalkReady],
+    ['companionClickAReady', companionClickAReady],
+    ['companionClickBReady', companionClickBReady],
     ['companionRuntimeReady', companionRuntimeReady],
+    ['firstPosterReady', firstPosterReady],
     ['firstMediaReady', firstMediaReady],
     ['layoutReady', layoutReady],
   ];
