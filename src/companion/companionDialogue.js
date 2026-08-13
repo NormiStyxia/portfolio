@@ -1,3 +1,14 @@
+export const companionIntroDialogue = {
+  lines: [
+    '你好，我是绿毛同事。',
+    '这里是诺米的个人作品集，下面放着她这段时间做的一些游戏。',
+    '我平时负责教程、提示，还有在项目快炸的时候被拖来救场。',
+    '看项目的时候有哪里想多知道一点，就戳我。我可以补充说明，也可以带你去别的项目。',
+  ],
+  showProjectNavigation: false,
+  autoAdvance: true,
+};
+
 export const companionDialogue = {
   hero: {
     first: [
@@ -7,6 +18,9 @@ export const companionDialogue = {
     later: [
       ['不知道看哪个的话，先看牛顿那个。毕竟我在那里工伤最多。'],
       ['选一个，我又不能替你全看了。'],
+      ['又回来了？'],
+      ['想看哪个就戳我，我带路。'],
+      ['项目都在下面，我只是负责补充内部资料。'],
     ],
     showProjectNavigation: true,
   },
@@ -84,4 +98,3 @@ export function getCompanionDialogue(context, visitCount, random = Math.random) 
     showProjectNavigation: dialogue.showProjectNavigation === true,
   };
 }
-

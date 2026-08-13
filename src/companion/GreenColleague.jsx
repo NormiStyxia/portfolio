@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { companionClips, preloadCompanionClip } from './companionAssets.js';
-import { getCompanionDialogue } from './companionDialogue.js';
+import { companionIntroDialogue, getCompanionDialogue } from './companionDialogue.js';
 import {
   useActivePortfolioSection,
   useCompanionMovement,
@@ -9,6 +9,26 @@ import {
 import './GreenColleague.css';
 
 const reactionClips = ['tapReactA', 'tapReactB'];
+const INTRO_STORAGE_KEY = 'companionIntroSeen';
+const INTRO_IDLE = 'intro-idle';
+const INTRO_DIALOGUE = 'intro-dialogue';
+const INTRO_COMPLETE = 'complete';
+
+function hasSeenCompanionIntro() {
+  try {
+    return window.sessionStorage.getItem(INTRO_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function rememberCompanionIntro() {
+  try {
+    window.sessionStorage.setItem(INTRO_STORAGE_KEY, 'true');
+  } catch {
+    // The companion still works when storage is unavailable.
+  }
+}
 
 function useViewportWidth() {
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
@@ -93,13 +113,26 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
   };
 }
 
-function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }) {
+function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, onComplete, style }) {
   const [lineIndex, setLineIndex] = useState(0);
   const isLastLine = lineIndex === dialogue.lines.length - 1;
 
   useEffect(() => {
     setLineIndex(0);
   }, [dialogue]);
+
+  useEffect(() => {
+    if (!dialogue.autoAdvance) return undefined;
+
+    const line = dialogue.lines[lineIndex] || '';
+    const delay = Math.min(4300, 1500 + line.length * 55);
+    const timer = window.setTimeout(() => {
+      if (isLastLine) onComplete?.();
+      else setLineIndex((current) => current + 1);
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [dialogue, isLastLine, lineIndex, onComplete]);
 
   return (
     <section
@@ -141,14 +174,22 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }
 
 export function GreenColleague({ sectionTargets, projectAnchors }) {
   const rootRef = useRef(null);
-  const seenCountRef = useRef({});
+  const introInitiallySeenRef = useRef(null);
+  if (introInitiallySeenRef.current === null) {
+    introInitiallySeenRef.current = hasSeenCompanionIntro();
+  }
+  const seenCountRef = useRef(introInitiallySeenRef.current ? { hero: 1 } : {});
   const pointerRef = useRef(null);
   const suppressClickRef = useRef(false);
   const [dialogue, setDialogue] = useState(null);
+  const [introPhase, setIntroPhase] = useState(
+    introInitiallySeenRef.current ? INTRO_COMPLETE : INTRO_IDLE,
+  );
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const reducedMotion = useReducedMotion();
   const currentSection = useActivePortfolioSection(sectionTargets);
-  const movement = useCompanionMovement({ paused: dialogue !== null, reducedMotion });
+  const introActive = introPhase !== INTRO_COMPLETE;
+  const movement = useCompanionMovement({ paused: dialogue !== null || introActive, reducedMotion });
   const viewportWidth = useViewportWidth();
   const animation = useCompanionAnimation({
     movementMode: movement.mode,
@@ -156,18 +197,51 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     reducedMotion,
   });
 
-  useEffect(() => {
+  const completeIntro = useCallback(() => {
+    rememberCompanionIntro();
+    seenCountRef.current.hero = Math.max(1, seenCountRef.current.hero || 0);
+    setIntroPhase(INTRO_COMPLETE);
     setDialogue(null);
-  }, [currentSection]);
+  }, []);
+
+  useEffect(() => {
+    if (introPhase !== INTRO_IDLE) return undefined;
+    if (currentSection !== 'hero') {
+      completeIntro();
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      rememberCompanionIntro();
+      setDialogue(companionIntroDialogue);
+      setIntroPhase(INTRO_DIALOGUE);
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, [completeIntro, currentSection, introPhase]);
+
+  useEffect(() => {
+    if (introActive) {
+      if (currentSection !== 'hero') completeIntro();
+      return;
+    }
+    setDialogue(null);
+  }, [completeIntro, currentSection, introActive]);
 
   useEffect(() => {
     if (!dialogue) return undefined;
 
     const handlePointerDown = (event) => {
-      if (!rootRef.current?.contains(event.target)) setDialogue(null);
+      if (!rootRef.current?.contains(event.target)) {
+        if (introActive) completeIntro();
+        else setDialogue(null);
+      }
     };
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setDialogue(null);
+      if (event.key === 'Escape') {
+        if (introActive) completeIntro();
+        else setDialogue(null);
+      }
     };
 
     document.addEventListener('pointerdown', handlePointerDown);
@@ -176,7 +250,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       document.removeEventListener('pointerdown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [dialogue]);
+  }, [completeIntro, dialogue, introActive]);
 
   const openDialogue = () => {
     animation.playTapReaction();
@@ -188,7 +262,8 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const handlePointerDown = (event) => {
     if (event.button !== 0) return;
     const characterBounds = event.currentTarget.getBoundingClientRect();
-    setDialogue(null);
+    if (introActive) completeIntro();
+    else setDialogue(null);
     suppressClickRef.current = false;
     pointerRef.current = {
       id: event.pointerId,
@@ -278,6 +353,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       className="green-colleague"
       data-section={currentSection}
       data-motion={movement.mode}
+      data-intro={introPhase}
       ref={rootRef}
       style={{
         '--companion-x': `${movement.x}px`,
@@ -289,7 +365,8 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
           dialogue={dialogue}
           projectAnchors={projectAnchors}
           onNavigate={navigateToProject}
-          onClose={() => setDialogue(null)}
+          onClose={introActive ? completeIntro : () => setDialogue(null)}
+          onComplete={introActive ? completeIntro : undefined}
           style={{
             '--bubble-left': `${bubbleMetrics.left}px`,
             '--bubble-width': `${bubbleMetrics.width}px`,

@@ -33,6 +33,12 @@ function getBounds(config = getMotionConfig()) {
   return { minimum, maximum };
 }
 
+function getInitialPosition() {
+  const fraction = window.innerWidth < 768 ? 0.88 : 0.28;
+  const bounds = getBounds();
+  return clamp(window.innerWidth * fraction, bounds.minimum, bounds.maximum);
+}
+
 function chooseWalkTarget(machine) {
   const config = getMotionConfig();
   const bounds = getBounds(config);
@@ -90,11 +96,7 @@ export function useReducedMotion() {
 
 export function useCompanionMovement({ paused, reducedMotion }) {
   const [snapshot, setSnapshot] = useState(() => ({
-    x: typeof window === 'undefined' ? 0 : clamp(
-      window.innerWidth * (window.innerWidth < 768 ? 0.88 : 0.78),
-      getBounds().minimum,
-      getBounds().maximum,
-    ),
+    x: typeof window === 'undefined' ? 0 : getInitialPosition(),
     mode: 'idle',
     facing: 'left',
   }));
