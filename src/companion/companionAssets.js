@@ -30,6 +30,14 @@ export const companionClips = {
     frameHeight: 512,
     footAnchor: { x: 128, y: 501 },
   },
+  drag: {
+    frames: framePaths('drag', 16),
+    fps: 16,
+    loop: true,
+    frameWidth: 360,
+    frameHeight: 512,
+    footAnchor: { x: 208, y: 512 },
+  },
   tapReactA: {
     frames: framePaths('tap_react_a', 16),
     fps: 16,
@@ -58,4 +66,3 @@ export function preloadCompanionClip(clipName) {
     image.src = src;
   });
 }
-

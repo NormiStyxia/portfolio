@@ -32,12 +32,11 @@ Source reviewed from `牛顿-maker/scripts/green_assistant/` and the generated r
 - Portable source behavior states: `IDLE`, `WALK/ROAM`, `INTERACT/DIALOGUE`.
 - Game-only source states: `DRAGGING`, `OBSERVE`, `OFFER`, `TAKEOVER`, `SUCCESS`, `DISABLED`.
 - Runtime clips: `idle`, `blink`, `move`, `drag`, `tap_react_a`, `tap_react_b`, `takeover_raise`, `takeover_loop`, `takeover_finish`.
-- Portfolio clips included: `idle`, `blink`, `move`, `tap_react_a`, `tap_react_b`.
+- Portfolio clips included: `idle`, `blink`, `move`, `drag`, `tap_react_a`, `tap_react_b`.
 
 ## Intentionally excluded
 
-- Dragging and out-of-zone relocation effects: the portfolio interaction is a click/tap dialogue, not a draggable game object.
+- Free vertical dragging and out-of-zone relocation effects: the portfolio version keeps the original drag pose, but constrains relocation to the shared bottom baseline and clamps the released horizontal position to the safe viewport bounds.
 - Failure thresholds, tutorial observation, standard-solution replay, player-input locking, and Computer Use/takeover behavior.
 - UrhoX/NVG renderer code, game event subscriptions, level IDs, and NEWTONignore-specific adapters.
 - Takeover animation clips and gameplay choice UI. Extension points remain at the section-context and navigation bridge instead.
-

@@ -26,7 +26,7 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
   const [reactionClip, setReactionClip] = useState(null);
   const [blinkClip, setBlinkClip] = useState(false);
   const [frameIndex, setFrameIndex] = useState(0);
-  const baseClip = movementMode === 'walk' ? 'move' : 'idle';
+  const baseClip = movementMode === 'drag' ? 'drag' : movementMode === 'walk' ? 'move' : 'idle';
   const activeClipName = reactionClip || (blinkClip ? 'blink' : baseClip);
   const activeClip = companionClips[activeClipName];
 
@@ -134,6 +134,8 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }
 export function GreenColleague({ sectionTargets, projectAnchors }) {
   const rootRef = useRef(null);
   const seenCountRef = useRef({});
+  const pointerRef = useRef(null);
+  const suppressClickRef = useRef(false);
   const [dialogue, setDialogue] = useState(null);
   const reducedMotion = useReducedMotion();
   const currentSection = useActivePortfolioSection(sectionTargets);
@@ -172,6 +174,58 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     const seenCount = seenCountRef.current[currentSection] || 0;
     setDialogue(getCompanionDialogue(currentSection, seenCount));
     seenCountRef.current[currentSection] = seenCount + 1;
+  };
+
+  const handlePointerDown = (event) => {
+    if (event.button !== 0) return;
+    setDialogue(null);
+    suppressClickRef.current = false;
+    pointerRef.current = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      grabOffsetX: movement.x - event.clientX,
+      dragging: false,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    preloadCompanionClip('drag');
+  };
+
+  const handlePointerMove = (event) => {
+    const pointer = pointerRef.current;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    const distance = Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY);
+    if (!pointer.dragging && distance >= 8) {
+      pointer.dragging = true;
+      movement.beginDrag();
+    }
+    if (!pointer.dragging) return;
+
+    event.preventDefault();
+    movement.dragTo(event.clientX + pointer.grabOffsetX);
+  };
+
+  const finishPointerInteraction = (event) => {
+    const pointer = pointerRef.current;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture?.(event.pointerId);
+    }
+    if (pointer.dragging) {
+      suppressClickRef.current = true;
+      movement.endDrag();
+    }
+    pointerRef.current = null;
+  };
+
+  const handleCharacterClick = () => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    openDialogue();
   };
 
   const navigateToProject = (id) => {
@@ -220,10 +274,16 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       <button
         className="green-colleague__character"
         type="button"
-        onClick={openDialogue}
+        style={spriteStyle}
+        onClick={handleCharacterClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishPointerInteraction}
+        onPointerCancel={finishPointerInteraction}
         onPointerEnter={() => {
           preloadCompanionClip('tapReactA');
           preloadCompanionClip('tapReactB');
+          preloadCompanionClip('drag');
         }}
         onFocus={() => {
           preloadCompanionClip('tapReactA');
@@ -239,7 +299,6 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
           aria-hidden="true"
           draggable="false"
           data-facing={movement.facing}
-          style={spriteStyle}
         />
       </button>
     </div>

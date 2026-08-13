@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const DESKTOP_CONFIG = {
   safeMargin: 18,
-  characterHalfWidth: 52,
+  characterHalfWidth: 110,
   minWalkDistance: 72,
   maxWalkDistance: 320,
   moveSpeed: 64,
@@ -10,7 +10,7 @@ const DESKTOP_CONFIG = {
 
 const MOBILE_CONFIG = {
   safeMargin: 10,
-  characterHalfWidth: 38,
+  characterHalfWidth: 58,
   minWalkDistance: 16,
   maxWalkDistance: 48,
   moveSpeed: 46,
@@ -189,7 +189,7 @@ export function useCompanionMovement({ paused, reducedMotion }) {
           const speed = machine.correctingBounds ? Math.max(96, config.moveSpeed) : config.moveSpeed;
           machine.x += direction * Math.min(distance, speed * deltaTime);
         }
-      } else if (!pausedRef.current && !reducedMotionRef.current) {
+      } else if (machine.mode !== 'drag' && !pausedRef.current && !reducedMotionRef.current) {
         machine.idleRemaining -= deltaTime;
         if (machine.idleRemaining <= 0) startWalk(chooseWalkTarget(machine));
       }
@@ -200,6 +200,11 @@ export function useCompanionMovement({ paused, reducedMotion }) {
 
     const handleResize = () => {
       const bounds = getBounds();
+      if (machine.mode === 'drag') {
+        machine.x = clamp(machine.x, bounds.minimum, bounds.maximum);
+        publish();
+        return;
+      }
       if (machine.x < bounds.minimum || machine.x > bounds.maximum) {
         startWalk(clamp(machine.x, bounds.minimum, bounds.maximum), true);
       } else if (machine.targetX !== null) {
@@ -216,7 +221,39 @@ export function useCompanionMovement({ paused, reducedMotion }) {
     };
   }, []);
 
-  return snapshot;
+  const beginDrag = () => {
+    const machine = machineRef.current;
+    machine.mode = 'drag';
+    machine.targetX = null;
+    machine.correctingBounds = false;
+    setSnapshot({ x: machine.x, mode: 'drag', facing: machine.facing });
+  };
+
+  const dragTo = (x) => {
+    const machine = machineRef.current;
+    const bounds = getBounds();
+    const nextX = clamp(x, bounds.minimum, bounds.maximum);
+    if (Math.abs(nextX - machine.x) > 0.1) {
+      machine.facing = nextX > machine.x ? 'right' : 'left';
+    }
+    machine.x = nextX;
+    machine.mode = 'drag';
+    machine.targetX = null;
+    setSnapshot({ x: machine.x, mode: 'drag', facing: machine.facing });
+  };
+
+  const endDrag = () => {
+    const machine = machineRef.current;
+    const bounds = getBounds();
+    machine.x = clamp(machine.x, bounds.minimum, bounds.maximum);
+    machine.mode = 'idle';
+    machine.targetX = null;
+    machine.correctingBounds = false;
+    machine.idleRemaining = randomBetween(2.6, 5.6);
+    setSnapshot({ x: machine.x, mode: 'idle', facing: machine.facing });
+  };
+
+  return { ...snapshot, beginDrag, dragTo, endDrag };
 }
 
 function scoreSection(element) {
