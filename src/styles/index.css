@@ -574,7 +574,8 @@ button {
   font-family: var(--font-cn-body);
   font-weight: 400;
   font-synthesis: none;
-  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.55;
 }
 
 .project-evidence ol,
@@ -909,7 +910,7 @@ button {
     padding-top: 0;
   }
 
-  .project-evidence > p {
+  .project-evidence > p.design-note {
     margin-bottom: clamp(0.8rem, 1.6svh, 1.25rem);
     font-size: clamp(0.9rem, 1vw, 1rem);
     line-height: 1.55;
@@ -1111,6 +1112,11 @@ button {
 
   .project-evidence {
     grid-template-columns: 6fr 6fr;
+  }
+
+  .project-evidence > p.design-note {
+    font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+    line-height: 1.55;
   }
 
   .project-evidence .project-links {
