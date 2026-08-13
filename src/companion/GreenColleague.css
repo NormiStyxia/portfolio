@@ -113,6 +113,9 @@
 }
 
 .green-colleague__lines p {
+  font-family: inherit;
+  font-weight: inherit;
+  font-synthesis: none;
   margin: 0;
   animation: green-colleague-line-in 180ms var(--ease-out) both;
 }
