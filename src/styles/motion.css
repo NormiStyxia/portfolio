@@ -1,0 +1,561 @@
+/* Motion Pass: one quiet editorial language, with project-specific accents. */
+
+@keyframes motion-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motion-line-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.site-header {
+  border-bottom-color: transparent;
+}
+
+.site-header::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-border-subtle);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 560ms var(--ease-out);
+}
+
+.site-header .site-mark,
+.site-header .site-nav__desktop,
+.site-header .menu-button {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+}
+
+.site-header.is-motion-ready::after {
+  transform: scaleX(1);
+}
+
+.site-header.is-motion-ready .site-mark,
+.site-header.is-motion-ready .site-nav__desktop,
+.site-header.is-motion-ready .menu-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-header.is-motion-ready .site-nav__desktop,
+.site-header.is-motion-ready .menu-button {
+  transition-delay: 80ms;
+}
+
+.site-mark__monogram > span {
+  display: block;
+  transition: transform 180ms var(--ease-out);
+}
+
+.site-mark:hover .site-mark__monogram > span,
+.site-mark:focus-visible .site-mark__monogram > span {
+  transform: translate(1.5px, -1.5px);
+}
+
+@media (hover: hover) {
+  .menu-button:hover .menu-button__icon i:first-child {
+    transform: translateX(4px);
+  }
+}
+
+/* Hero reveal begins only after the loader starts its exit. */
+.portfolio-app[data-bootstrap='loading'] .hero .eyebrow,
+.portfolio-app[data-bootstrap='loading'] .hero__avatar,
+.portfolio-app[data-bootstrap='loading'] .hero__roles p,
+.portfolio-app[data-bootstrap='loading'] .hero__motto > p:last-child,
+.portfolio-app[data-bootstrap='loading'] .hero__practice p,
+.portfolio-app[data-bootstrap='loading'] .hero__actions {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.hero .eyebrow,
+.hero__avatar,
+.hero__roles p,
+.hero__motto > p:last-child,
+.hero__practice p,
+.hero__actions {
+  transition: opacity 430ms var(--ease-out), transform 430ms var(--ease-out), clip-path 650ms var(--ease-out);
+}
+
+.hero h1 {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 680ms var(--ease-out);
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero h1 {
+  clip-path: inset(0 0 0 0);
+  transition-delay: 80ms;
+}
+
+.hero__avatar {
+  clip-path: inset(0 0 100% 0);
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero__avatar {
+  clip-path: inset(0 0 0 0);
+  transition-delay: 150ms;
+}
+
+.hero__roles {
+  border-top-color: transparent;
+}
+
+.hero__roles p {
+  position: relative;
+  border-bottom-color: transparent;
+}
+
+.hero__roles p::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-border-subtle);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 480ms var(--ease-out);
+}
+
+.hero__roles p:first-child::before {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-ink);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 480ms var(--ease-out);
+}
+
+.hero__roles p > span {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+}
+
+.hero__roles .hero__role-label {
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p,
+.portfolio-app:not([data-bootstrap='loading']) .hero__motto > p:last-child,
+.portfolio-app:not([data-bootstrap='loading']) .hero__practice p,
+.portfolio-app:not([data-bootstrap='loading']) .hero__actions,
+.portfolio-app:not([data-bootstrap='loading']) .hero .eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p::before,
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p::after {
+  transform: scaleX(1);
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p > span {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1) > span:first-child { transition-delay: 130ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1) .hero__role-label { transition-delay: 180ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1)::before,
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(1)::after { transition-delay: 205ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2) > span:first-child { transition-delay: 210ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2) .hero__role-label { transition-delay: 260ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__roles p:nth-child(2)::after { transition-delay: 285ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__motto > .eyebrow { transition-delay: 225ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__motto > p:last-child { transition-delay: 285ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__practice p:first-child { transition-delay: 330ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__practice p:last-child { transition-delay: 410ms; }
+.portfolio-app:not([data-bootstrap='loading']) .hero__actions { transition-delay: 450ms; }
+
+.arrow-link {
+  position: relative;
+  border-bottom-color: transparent;
+  transition: color var(--duration-fast) ease;
+}
+
+.arrow-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  content: '';
+  transform: scaleX(0.82);
+  transform-origin: left;
+  transition: transform 180ms var(--ease-out);
+}
+
+.arrow-link > span:last-child {
+  transition: transform 180ms var(--ease-out);
+}
+
+.arrow-link:hover {
+  gap: 1rem;
+}
+
+.arrow-link:hover::after,
+.arrow-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.arrow-link:hover > span:last-child,
+.arrow-link:focus-visible > span:last-child {
+  transform: translateX(4px);
+}
+
+/* Shared one-shot reveal. Body copy remains a single reading unit. */
+.section-intro .eyebrow,
+.section-intro > p:last-child,
+.motion-section .project-rule > span,
+.motion-section .project-kicker,
+.motion-section .project-core,
+.motion-section .project-meta > div,
+.motion-section .design-note,
+.motion-section .project-links,
+.motion-section.about .eyebrow,
+.motion-section.about h2,
+.motion-section.about .about__copy p,
+.motion-section.about .contact-list,
+.motion-section.about .about__links,
+.motion-section.site-footer .site-footer__inner > * {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 440ms var(--ease-out), transform 440ms var(--ease-out);
+}
+
+.section-intro.is-revealed .eyebrow,
+.section-intro.is-revealed > p:last-child,
+.motion-section.is-revealed .project-rule > span,
+.motion-section.is-revealed .project-kicker,
+.motion-section.is-revealed .project-core,
+.motion-section.is-revealed .project-meta > div,
+.motion-section.is-revealed .design-note,
+.motion-section.is-revealed .project-links,
+.motion-section.about.is-revealed .eyebrow,
+.motion-section.about.is-revealed h2,
+.motion-section.about.is-revealed .about__copy p,
+.motion-section.about.is-revealed .contact-list,
+.motion-section.about.is-revealed .about__links,
+.motion-section.site-footer.is-revealed .site-footer__inner > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-intro.is-revealed > p:last-child { transition-delay: 70ms; }
+
+.motion-section .project-rule {
+  border-top-color: transparent;
+}
+
+.motion-section .project-rule::before {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: var(--project-line);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 620ms var(--ease-out);
+}
+
+.motion-section.is-revealed .project-rule::before {
+  transform: scaleX(1);
+}
+
+.motion-section .project-rule > span:first-child { transition-delay: 70ms; }
+.motion-section .project-rule > span:last-child { transition-delay: 115ms; }
+.motion-section .project-kicker { transition-delay: 120ms; }
+.motion-section .project-core { transition-delay: 190ms; }
+.motion-section .project-meta > div:nth-child(1) { transition-delay: 200ms; }
+.motion-section .project-meta > div:nth-child(2) { transition-delay: 245ms; }
+.motion-section .project-meta > div:nth-child(3) { transition-delay: 290ms; }
+.motion-section .project-meta > div:nth-child(4) { transition-delay: 335ms; }
+.motion-section .design-note { transition-delay: 285ms; }
+.motion-section .project-links { transition-delay: 330ms; }
+
+.motion-section.project h3 {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 680ms var(--ease-out);
+}
+
+.motion-section.project.is-revealed h3 {
+  clip-path: inset(0 0 0 0);
+  transition-delay: 110ms;
+}
+
+.project--newton .project-rule::after,
+.project--anchor .project-rule::after {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: opacity 240ms var(--ease-out), transform 560ms var(--ease-out);
+}
+
+.project--newton.is-revealed .project-rule::after {
+  transform: scaleX(1);
+  transition-delay: 360ms;
+}
+
+.project--anchor.is-revealed .project-rule::after {
+  transform: scaleX(1);
+  transition-delay: 260ms;
+}
+
+.project--crimson::after {
+  transform: translate(14px, -7px);
+  transition: opacity 420ms var(--ease-out), transform 720ms var(--ease-out);
+}
+
+.project--crimson.is-revealed::after {
+  transform: translate(0, 0);
+}
+
+.realmwalker-trace {
+  position: absolute;
+  z-index: -1;
+  top: 9%;
+  right: calc(50% - 49vw);
+  width: min(34vw, 30rem);
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.realmwalker-trace path {
+  fill: none;
+  stroke: var(--project-line);
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+  stroke-width: 1;
+  opacity: 0.44;
+  transition: stroke-dashoffset 820ms var(--ease-out);
+}
+
+.project--realmwalker::after {
+  display: none;
+}
+
+.project--realmwalker.is-revealed .realmwalker-trace path {
+  stroke-dashoffset: 0;
+  transition-delay: 180ms;
+}
+
+/* Media owns its loading state; section reveal only controls when the ready asset is uncovered. */
+.media-figure__content {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  transition: opacity 280ms var(--ease-out), clip-path 760ms var(--ease-out), transform 260ms var(--ease-out);
+}
+
+.media-figure__status {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  opacity: 1;
+  text-transform: uppercase;
+  transition: opacity 180ms ease;
+}
+
+.media-ready .media-figure__status {
+  opacity: 0;
+}
+
+.motion-section.is-revealed .media-ready .media-figure__content,
+.hero .media-ready .media-figure__content {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+.media-error .media-figure__content {
+  opacity: 0;
+}
+
+.media-reveal-bars {
+  display: none;
+}
+
+.project--crimson .media-figure__content {
+  clip-path: none;
+}
+
+.project--crimson .media-reveal-bars {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  pointer-events: none;
+}
+
+.project--crimson .media-reveal-bars i {
+  display: block;
+  background: var(--color-canvas-alt);
+  transform: translateY(0);
+  transition: transform 620ms var(--ease-out);
+}
+
+.project--crimson.is-revealed .media-ready .media-reveal-bars i:nth-child(1) { transform: translateY(-102%); transition-delay: 100ms; }
+.project--crimson.is-revealed .media-ready .media-reveal-bars i:nth-child(2) { transform: translateY(102%); transition-delay: 175ms; }
+.project--crimson.is-revealed .media-ready .media-reveal-bars i:nth-child(3) { transform: translateY(-102%); transition-delay: 250ms; }
+
+.project--realmwalker .media-figure__content {
+  clip-path: none;
+  transform: translateY(8px);
+  transition-duration: 720ms;
+}
+
+.project--realmwalker.is-revealed .media-ready .media-figure__content {
+  transform: translateY(0);
+}
+
+.motion-section.about h2 {
+  clip-path: inset(0 100% 0 0);
+  transform: none;
+  transition: opacity 440ms var(--ease-out), clip-path 680ms var(--ease-out);
+}
+
+.motion-section.about.is-revealed h2 {
+  clip-path: inset(0 0 0 0);
+  transition-delay: 60ms;
+}
+
+.motion-section.about.is-revealed .about__copy p:nth-child(1) { transition-delay: 100ms; }
+.motion-section.about.is-revealed .about__copy p:nth-child(2) { transition-delay: 180ms; }
+.motion-section.about.is-revealed .contact-list { transition-delay: 210ms; }
+.motion-section.about.is-revealed .about__links { transition-delay: 260ms; }
+
+.motion-section.about .contact-list {
+  position: relative;
+  border-top-color: transparent;
+}
+
+.motion-section.about .contact-list::before {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-ink);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 560ms var(--ease-out);
+}
+
+.motion-section.about.is-revealed .contact-list::before {
+  transform: scaleX(1);
+  transition-delay: 190ms;
+}
+
+.site-footer {
+  position: relative;
+}
+
+.site-footer::before {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-canvas) 72%, transparent);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 560ms var(--ease-out);
+}
+
+.site-footer.is-revealed::before { transform: scaleX(1); }
+.motion-section.site-footer.is-revealed .site-footer__inner > *:nth-child(1) { transition-delay: 80ms; }
+.motion-section.site-footer.is-revealed .site-footer__inner > *:nth-child(2) { transition-delay: 125ms; }
+.motion-section.site-footer.is-revealed .site-footer__inner > *:nth-child(3) { transition-delay: 170ms; }
+
+@media (max-width: 767px) {
+  .section-intro .eyebrow,
+  .section-intro > p:last-child,
+  .motion-section .project-rule > span,
+  .motion-section .project-kicker,
+  .motion-section .project-core,
+  .motion-section .project-meta > div,
+  .motion-section .design-note,
+  .motion-section .project-links,
+  .motion-section.about .eyebrow,
+  .motion-section.about .about__copy p {
+    transform: translateY(4px);
+  }
+
+  .project--crimson::after {
+    transform: translate(7px, -3px);
+  }
+
+  .realmwalker-trace {
+    width: min(68vw, 22rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header::after,
+  .site-header .site-mark,
+  .site-header .site-nav__desktop,
+  .site-header .menu-button,
+  .hero .eyebrow,
+  .hero h1,
+  .hero__avatar,
+  .hero__roles p,
+  .hero__roles p > span,
+  .hero__motto > p:last-child,
+  .hero__practice p,
+  .hero__actions,
+  .section-intro .eyebrow,
+  .section-intro > p:last-child,
+  .motion-section .project-rule::before,
+  .motion-section .project-rule::after,
+  .motion-section .project-rule > span,
+  .motion-section .project-kicker,
+  .motion-section.project h3,
+  .motion-section .project-core,
+  .motion-section .project-meta > div,
+  .motion-section .design-note,
+  .motion-section .project-links,
+  .media-figure__content,
+  .motion-section.about .eyebrow,
+  .motion-section.about h2,
+  .motion-section.about .about__copy p,
+  .motion-section.about .contact-list,
+  .motion-section.about .about__links,
+  .motion-section.site-footer .site-footer__inner > * {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  .realmwalker-trace,
+  .media-reveal-bars {
+    display: none !important;
+  }
+}

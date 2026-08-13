@@ -5,7 +5,7 @@ const navigationItems = [
   { label: '关于', href: '#about' },
 ];
 
-export function GlobalNavigation({ name }) {
+export function GlobalNavigation({ name, motionReady = false }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -20,10 +20,10 @@ export function GlobalNavigation({ name }) {
   }, [isOpen]);
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${motionReady ? 'is-motion-ready' : ''}`}>
       <nav className="shell site-nav" aria-label="主导航">
         <a className="site-mark" href="#top" onClick={() => setIsOpen(false)}>
-          <span aria-hidden="true">NS</span>
+          <span className="site-mark__monogram" aria-hidden="true"><span>NS</span></span>
           <span className="site-mark__name">{name}</span>
         </a>
 
