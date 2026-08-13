@@ -1,0 +1,251 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { companionClips, preloadCompanionClip } from './companionAssets.js';
+import { getCompanionDialogue } from './companionDialogue.js';
+import {
+  useActivePortfolioSection,
+  useCompanionMovement,
+  useReducedMotion,
+} from './companionState.js';
+import './GreenColleague.css';
+
+const reactionClips = ['tapReactA', 'tapReactB'];
+
+function useViewportWidth() {
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return viewportWidth;
+}
+
+function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
+  const [reactionClip, setReactionClip] = useState(null);
+  const [blinkClip, setBlinkClip] = useState(false);
+  const [frameIndex, setFrameIndex] = useState(0);
+  const baseClip = movementMode === 'walk' ? 'move' : 'idle';
+  const activeClipName = reactionClip || (blinkClip ? 'blink' : baseClip);
+  const activeClip = companionClips[activeClipName];
+
+  useEffect(() => {
+    preloadCompanionClip('idle');
+    const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 350));
+    const cancel = window.cancelIdleCallback || window.clearTimeout;
+    const handle = schedule(() => {
+      preloadCompanionClip('move');
+      preloadCompanionClip('blink');
+    });
+    return () => cancel(handle);
+  }, []);
+
+  useEffect(() => {
+    setFrameIndex(0);
+    if (reducedMotion && !reactionClip) return undefined;
+
+    const interval = window.setInterval(() => {
+      setFrameIndex((previous) => {
+        const next = previous + 1;
+        if (next < activeClip.frames.length) return next;
+        if (activeClip.loop) return 0;
+
+        window.setTimeout(() => {
+          if (reactionClip) setReactionClip(null);
+          if (blinkClip) setBlinkClip(false);
+        }, 0);
+        return activeClip.frames.length - 1;
+      });
+    }, 1000 / activeClip.fps);
+
+    return () => window.clearInterval(interval);
+  }, [activeClip, blinkClip, reactionClip, reducedMotion]);
+
+  useEffect(() => {
+    if (movementMode !== 'idle' || dialogueOpen || reducedMotion || reactionClip || blinkClip) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setBlinkClip(true), 1800 + Math.random() * 2700);
+    return () => window.clearTimeout(timer);
+  }, [blinkClip, dialogueOpen, movementMode, reactionClip, reducedMotion]);
+
+  const playTapReaction = () => {
+    preloadCompanionClip('tapReactA');
+    preloadCompanionClip('tapReactB');
+    setBlinkClip(false);
+    setReactionClip(reactionClips[Math.floor(Math.random() * reactionClips.length)]);
+  };
+
+  return {
+    clip: activeClip,
+    frameSrc: activeClip.frames[Math.min(frameIndex, activeClip.frames.length - 1)],
+    playTapReaction,
+  };
+}
+
+function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }) {
+  const [lineIndex, setLineIndex] = useState(0);
+  const isLastLine = lineIndex === dialogue.lines.length - 1;
+
+  useEffect(() => {
+    setLineIndex(0);
+  }, [dialogue]);
+
+  return (
+    <section
+      className="green-colleague__bubble"
+      aria-label="绿毛同事说"
+      aria-live="polite"
+      style={style}
+    >
+      <button className="green-colleague__close" type="button" onClick={onClose} aria-label="收起对话">
+        ×
+      </button>
+      <div className="green-colleague__lines">
+        <p>{dialogue.lines[lineIndex]}</p>
+      </div>
+      {!isLastLine ? (
+        <button
+          className="green-colleague__continue"
+          type="button"
+          onClick={() => setLineIndex((current) => current + 1)}
+        >
+          <span>{lineIndex + 1} / {dialogue.lines.length}</span>
+          <span>下一句 →</span>
+        </button>
+      ) : null}
+      {dialogue.showProjectNavigation && isLastLine ? (
+        <nav className="green-colleague__choices" aria-label="选择项目">
+          {projectAnchors.map((project) => (
+            <button key={project.id} type="button" onClick={() => onNavigate(project.id)}>
+              <span>{project.label}</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
+      <span className="green-colleague__tail" aria-hidden="true" />
+    </section>
+  );
+}
+
+export function GreenColleague({ sectionTargets, projectAnchors }) {
+  const rootRef = useRef(null);
+  const seenCountRef = useRef({});
+  const [dialogue, setDialogue] = useState(null);
+  const reducedMotion = useReducedMotion();
+  const currentSection = useActivePortfolioSection(sectionTargets);
+  const movement = useCompanionMovement({ paused: dialogue !== null, reducedMotion });
+  const viewportWidth = useViewportWidth();
+  const animation = useCompanionAnimation({
+    movementMode: movement.mode,
+    dialogueOpen: dialogue !== null,
+    reducedMotion,
+  });
+
+  useEffect(() => {
+    setDialogue(null);
+  }, [currentSection]);
+
+  useEffect(() => {
+    if (!dialogue) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!rootRef.current?.contains(event.target)) setDialogue(null);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setDialogue(null);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [dialogue]);
+
+  const openDialogue = () => {
+    animation.playTapReaction();
+    const seenCount = seenCountRef.current[currentSection] || 0;
+    setDialogue(getCompanionDialogue(currentSection, seenCount));
+    seenCountRef.current[currentSection] = seenCount + 1;
+  };
+
+  const navigateToProject = (id) => {
+    const target = document.getElementById(id);
+    setDialogue(null);
+    target?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+  };
+
+  const bubbleMetrics = useMemo(() => {
+    const edge = viewportWidth < 768 ? 10 : 16;
+    const width = Math.min(viewportWidth - edge * 2, viewportWidth < 768 ? 300 : 320);
+    const left = clamp(movement.x - width / 2, edge, viewportWidth - width - edge);
+    const tailLeft = clamp(movement.x - left, 22, width - 22);
+    return { left, width, tailLeft };
+  }, [movement.x, viewportWidth]);
+
+  const clip = animation.clip;
+  const spriteStyle = {
+    '--frame-width-factor': clip.frameWidth / clip.frameHeight,
+    '--foot-left-factor': -clip.footAnchor.x / clip.frameHeight,
+    '--foot-origin': `${(clip.footAnchor.x / clip.frameWidth) * 100}%`,
+  };
+
+  return (
+    <div
+      className="green-colleague"
+      data-section={currentSection}
+      data-motion={movement.mode}
+      ref={rootRef}
+      style={{ '--companion-x': `${movement.x}px` }}
+    >
+      {dialogue ? (
+        <DialogueBubble
+          dialogue={dialogue}
+          projectAnchors={projectAnchors}
+          onNavigate={navigateToProject}
+          onClose={() => setDialogue(null)}
+          style={{
+            '--bubble-left': `${bubbleMetrics.left}px`,
+            '--bubble-width': `${bubbleMetrics.width}px`,
+            '--bubble-tail-left': `${bubbleMetrics.tailLeft}px`,
+          }}
+        />
+      ) : null}
+
+      <button
+        className="green-colleague__character"
+        type="button"
+        onClick={openDialogue}
+        onPointerEnter={() => {
+          preloadCompanionClip('tapReactA');
+          preloadCompanionClip('tapReactB');
+        }}
+        onFocus={() => {
+          preloadCompanionClip('tapReactA');
+          preloadCompanionClip('tapReactB');
+        }}
+        aria-label={`戳一下绿毛同事。当前正在看${sectionTargets.find((item) => item.context === currentSection)?.label || '作品集'}`}
+        aria-expanded={dialogue !== null}
+      >
+        <img
+          className="green-colleague__sprite"
+          src={animation.frameSrc}
+          alt=""
+          aria-hidden="true"
+          draggable="false"
+          data-facing={movement.facing}
+          style={spriteStyle}
+        />
+      </button>
+    </div>
+  );
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}

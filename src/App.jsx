@@ -1,7 +1,21 @@
 import { GlobalNavigation } from './components/GlobalNavigation.jsx';
 import { MediaFigure } from './components/MediaFigure.jsx';
+import { GreenColleague } from './companion/GreenColleague.jsx';
 import { projects } from './data/projects.js';
 import { site } from './data/site.js';
+
+const companionSections = [
+  { context: 'hero', id: 'hero', label: '首页' },
+  { context: 'newton', id: 'newton-ignore', label: '不经典力学' },
+  { context: 'anchor', id: 'anchor-maze', label: 'Anchor Maze' },
+  { context: 'crimson', id: 'crimson-leap', label: '绯红之跃' },
+  { context: 'realmwalker', id: 'realm-walker-prologue', label: '幻界行者·序章' },
+  { context: 'about', id: 'about', label: '关于' },
+];
+
+const companionProjectAnchors = companionSections
+  .filter(({ context }) => !['hero', 'about'].includes(context))
+  .map(({ id, label }) => ({ id, label }));
 
 const externalProps = {
   target: '_blank',
@@ -160,15 +174,16 @@ function App() {
   const [newton, anchor, crimson, archive] = projects;
 
   return (
-    <div className="site" id="top">
-      <GlobalNavigation name={site.name} />
+    <>
+      <div className="site" id="top">
+        <GlobalNavigation name={site.name} />
 
-      <main id="main-content">
-        <section className="hero shell" aria-labelledby="hero-title">
-          <div className="hero__identity">
-            <p className="eyebrow">Portfolio / 2026</p>
-            <h1 id="hero-title">{site.name}</h1>
-          </div>
+        <main id="main-content">
+          <section className="hero shell" id="hero" aria-labelledby="hero-title">
+            <div className="hero__identity">
+              <p className="eyebrow">Portfolio / 2026</p>
+              <h1 id="hero-title">{site.name}</h1>
+            </div>
 
           <img
             className="hero__avatar"
@@ -202,7 +217,7 @@ function App() {
             <ArrowLink href="#selected-works">代表作品</ArrowLink>
           </div>
 
-        </section>
+          </section>
 
         <section className="selected-works shell" id="selected-works" aria-label="代表作品">
           <header className="section-intro">
@@ -236,16 +251,22 @@ function App() {
             <ArrowLink href={site.contact.bilibili} external>Bilibili</ArrowLink>
           </div>
         </section>
-      </main>
+        </main>
 
-      <footer className="site-footer">
-        <div className="shell site-footer__inner">
-          <p>诺米Styxia / Game Design Portfolio</p>
-          <p>Games / Tools / AI-native workflows</p>
-          <a href="#top">返回顶部 ↑</a>
-        </div>
-      </footer>
-    </div>
+        <footer className="site-footer">
+          <div className="shell site-footer__inner">
+            <p>诺米Styxia / Game Design Portfolio</p>
+            <p>Games / Tools / AI-native workflows</p>
+            <a href="#top">返回顶部 ↑</a>
+          </div>
+        </footer>
+      </div>
+
+      <GreenColleague
+        sectionTargets={companionSections}
+        projectAnchors={companionProjectAnchors}
+      />
+    </>
   );
 }
 
