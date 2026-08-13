@@ -74,9 +74,10 @@
   background: color-mix(in srgb, var(--color-canvas) 97%, white);
   box-shadow: none;
   color: var(--color-ink);
-  font-family: var(--font-cn-body);
+  font-family: var(--font-body);
   font-size: 0.86rem;
   font-weight: 400;
+  font-synthesis: none;
   letter-spacing: 0.01em;
   line-height: 1.58;
   padding: 0.9rem 2.5rem 0.85rem 1rem;
@@ -105,14 +106,20 @@
   background: transparent;
   color: var(--color-action);
   cursor: pointer;
-  font-family: var(--font-cn-body);
+  font-family: var(--font-body);
   font-size: 0.78rem;
+  font-weight: 400;
+  font-synthesis: none;
 }
 
-.green-colleague__continue span:first-child {
+.green-colleague__continue-count {
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
   font-size: 0.68rem;
+}
+
+.green-colleague__continue-icon {
+  font-family: var(--font-mono);
 }
 
 .green-colleague__close {
@@ -156,9 +163,15 @@
   background: transparent;
   color: var(--color-action);
   cursor: pointer;
-  font-family: var(--font-cn-body);
+  font-family: var(--font-body);
   font-size: 0.82rem;
+  font-weight: 400;
+  font-synthesis: none;
   text-align: left;
+}
+
+.green-colleague__choices button > span:last-child {
+  font-family: var(--font-mono);
 }
 
 .green-colleague__choices button:last-child {

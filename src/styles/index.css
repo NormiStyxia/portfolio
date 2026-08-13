@@ -5,6 +5,7 @@
 }
 
 html {
+  font-synthesis: none;
   scroll-behavior: smooth;
   scroll-padding-top: var(--header-height);
 }
@@ -14,7 +15,7 @@ body {
   min-width: 20rem;
   background: var(--color-canvas);
   color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.65;
   text-rendering: optimizeLegibility;
@@ -23,8 +24,11 @@ body {
 
 body,
 button,
+input,
+textarea,
+select,
 a {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 img,
@@ -106,7 +110,7 @@ button {
   gap: 0.8rem;
   color: var(--color-ink);
   font-size: 0.78rem;
-  font-weight: 650;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;
@@ -192,7 +196,8 @@ button {
 .about h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 540;
+  font-weight: 400;
+  font-synthesis: none;
   letter-spacing: -0.045em;
 }
 
@@ -263,7 +268,7 @@ button {
 
 .hero__practice p:first-child {
   font-size: clamp(1.1rem, 1.5vw, 1.4rem);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.45;
 }
 
@@ -293,7 +298,7 @@ button {
   border-bottom: 1px solid currentColor;
   color: var(--color-action);
   font-size: 0.86rem;
-  font-weight: 600;
+  font-weight: 400;
   text-decoration: none;
   transition: color var(--duration-fast) ease, gap var(--duration-fast) var(--ease-out);
 }
@@ -301,6 +306,10 @@ button {
 .arrow-link:hover {
   gap: 1.35rem;
   color: var(--color-ink);
+}
+
+.arrow-link > span:last-child {
+  font-family: var(--font-mono);
 }
 
 .selected-works {
@@ -368,17 +377,19 @@ button {
   margin-top: 0.22em;
   font-family: var(--font-mono);
   font-size: 0.24em;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .project-core {
+  font-family: var(--font-body);
   max-width: 33rem;
   margin: 0;
   font-size: clamp(1.25rem, 2vw, 2rem);
-  font-weight: 480;
+  font-weight: 400;
+  font-synthesis: none;
   line-height: 1.45;
 }
 
@@ -509,7 +520,7 @@ button {
   left: 6%;
   font-family: var(--font-display);
   font-size: clamp(5rem, 16vw, 16rem);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.08em;
   line-height: 0.8;
   opacity: 0.14;
@@ -527,7 +538,7 @@ button {
   text-align: right;
 }
 
-.media-placeholder__copy strong {
+.media-placeholder__title {
   font-family: var(--font-mono);
   font-size: clamp(0.7rem, 1vw, 0.9rem);
   letter-spacing: 0.08em;
@@ -1421,7 +1432,7 @@ button {
     max-width: 70%;
   }
 
-  .media-placeholder__copy strong {
+  .media-placeholder__title {
     font-size: 0.62rem;
   }
 

@@ -42,7 +42,7 @@ export function MediaFigure({ media, className = '' }) {
           {media.tone === 'newton' ? '01' : media.tone === 'anchor' ? '02' : '03'}
         </span>
         <div className="media-placeholder__copy">
-          <strong>{media.placeholder}</strong>
+          <span className="media-placeholder__title">{media.placeholder}</span>
           <span>{media.width} × {media.height}</span>
         </div>
         <span className="media-placeholder__axis media-placeholder__axis--x" aria-hidden="true" />

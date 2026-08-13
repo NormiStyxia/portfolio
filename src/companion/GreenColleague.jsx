@@ -120,8 +120,8 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }
           type="button"
           onClick={() => setLineIndex((current) => current + 1)}
         >
-          <span>{lineIndex + 1} / {dialogue.lines.length}</span>
-          <span>下一句 →</span>
+          <span className="green-colleague__continue-count">{lineIndex + 1} / {dialogue.lines.length}</span>
+          <span>下一句 <span className="green-colleague__continue-icon" aria-hidden="true">→</span></span>
         </button>
       ) : null}
       {dialogue.showProjectNavigation && isLastLine ? (
