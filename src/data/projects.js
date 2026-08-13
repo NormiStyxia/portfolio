@@ -46,7 +46,7 @@ export const projects = [
     englishTitle: 'NEWTONignore',
     year: '2026',
     duration: '21 天',
-    role: ['游戏设计', '关卡设计', '视觉设计', '工具开发'],
+    role: ['游戏设计', '关卡设计', '视觉设计'],
     platform: 'TapTap Maker',
     engine: 'UrhoX',
     context: '制造新星Game Jam第二期',

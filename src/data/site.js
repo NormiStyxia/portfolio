@@ -4,7 +4,7 @@ export const site = {
   avatar: `${import.meta.env.BASE_URL}assets/portfolio/hero/creator-avatar.gif`,
   motto: '在还不熟悉世界的规则时，我先试着把自己的世界搭起来。',
   whatIDo: {
-    lead: '做游戏，也做让游戏更好做的工具。',
+    lead: '做游戏，也在玩法、视觉和 AI-native 的创作方式里继续折腾。',
     detail: '从玩法、视觉到 AI-native 工作流，把想法一路做成真的能玩的东西。',
   },
   about: [

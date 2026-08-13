@@ -78,7 +78,7 @@ function ProjectLinks({ project }) {
 
 function FlagshipProject({ project }) {
   return (
-    <article className="project project--flagship" id={project.id} style={{ '--project-accent': project.accent }}>
+    <article className="project project--flagship project--newton" id={project.id} style={{ '--project-accent': project.accent }}>
       <div className="project-rule">
         <span>Project {project.index}</span>
         <span>Flagship / {project.year}</span>
@@ -151,7 +151,7 @@ function SecondaryProject({ project, reverse = false }) {
 
 function ArchiveProject({ project }) {
   return (
-    <article className="project project--archive" id={project.id} style={{ '--project-accent': project.accent }}>
+    <article className="project project--archive project--realmwalker" id={project.id} style={{ '--project-accent': project.accent }}>
       <div className="project-rule">
         <span>Project {project.index}</span>
         <span>Archive / Origin</span>
@@ -256,7 +256,7 @@ function App() {
         <footer className="site-footer">
           <div className="shell site-footer__inner">
             <p>诺米Styxia / Game Design Portfolio</p>
-            <p>Games / Tools / AI-native workflows</p>
+            <p>Game Design / Visual / AI-native</p>
             <a href="#top">返回顶部 ↑</a>
           </div>
         </footer>

@@ -338,20 +338,140 @@ button {
 
 .project {
   --project-accent: var(--color-action);
+  --project-line: var(--color-ink);
+  --project-muted: var(--color-text-secondary);
+  --project-surface: transparent;
+  position: relative;
+  isolation: isolate;
   margin-bottom: clamp(7rem, 13vw, 13rem);
   scroll-margin-top: 6rem;
 }
 
+.project::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw);
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    var(--project-surface) 10%,
+    var(--project-surface) 90%,
+    transparent 100%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.project--newton {
+  --project-line: #8f715d;
+  --project-muted: #735e50;
+  --project-surface: rgb(216 201 186 / 18%);
+}
+
+.project--anchor {
+  --project-line: #315d78;
+  --project-muted: #49697b;
+  --project-surface: rgb(49 93 120 / 5%);
+}
+
+.project--crimson {
+  --project-line: #963c3c;
+  --project-muted: #815151;
+  --project-surface: rgb(150 60 60 / 3%);
+}
+
+.project--realmwalker {
+  --project-line: #7e95b8;
+  --project-muted: #66758d;
+  --project-surface: rgb(168 190 223 / 12%);
+}
+
 .project-rule {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--color-ink);
+  border-top: 1px solid var(--project-line);
   padding-top: 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.project .project-kicker,
+.project .media-figure figcaption {
+  color: var(--project-muted);
+}
+
+.project .project-meta,
+.project .project-meta > div + div {
+  border-color: color-mix(in srgb, var(--project-line) 42%, var(--color-border-subtle));
+}
+
+.project--newton .project-rule::after {
+  position: absolute;
+  top: -0.35rem;
+  right: 0;
+  width: clamp(4.5rem, 9vw, 8rem);
+  height: 0.35rem;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--project-line) 0 1px,
+    transparent 1px 0.55rem
+  );
+  content: '';
+  opacity: 0.55;
+}
+
+.project--anchor .project-rule::after {
+  position: absolute;
+  top: -0.29rem;
+  left: 28%;
+  width: clamp(6rem, 12vw, 10rem);
+  height: 0.55rem;
+  background:
+    radial-gradient(circle, var(--project-line) 0 0.18rem, transparent 0.2rem) left center / 0.5rem 0.5rem no-repeat,
+    linear-gradient(var(--project-line), var(--project-line)) center / calc(100% - 0.65rem) 1px no-repeat,
+    radial-gradient(circle, var(--project-line) 0 0.18rem, transparent 0.2rem) right center / 0.5rem 0.5rem no-repeat;
+  content: '';
+  opacity: 0.7;
+}
+
+.project--anchor .media-figure__frame {
+  border-inline-start: 0.28rem solid color-mix(in srgb, var(--project-line) 88%, var(--color-ink));
+}
+
+.project--crimson::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw);
+  background:
+    linear-gradient(var(--project-line), var(--project-line)) 2.5vw 20% / clamp(3rem, 7vw, 7rem) 2px no-repeat,
+    linear-gradient(var(--project-line), var(--project-line)) calc(100% - 3vw) 57% / 1.1rem 5.5rem no-repeat,
+    linear-gradient(var(--project-line), var(--project-line)) calc(100% - 7vw) 76% / 4rem 0.65rem no-repeat;
+  content: '';
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.project--crimson .project-title-latin {
+  color: var(--project-accent);
+}
+
+.project--realmwalker::after {
+  position: absolute;
+  z-index: -1;
+  top: 11%;
+  right: calc(50% - 49vw);
+  width: min(34vw, 30rem);
+  height: min(11vw, 8rem);
+  border-top: 1px solid var(--project-line);
+  border-radius: 50%;
+  content: '';
+  opacity: 0.38;
+  pointer-events: none;
+  transform: rotate(-7deg);
 }
 
 .project-rule span:first-child {
@@ -1602,5 +1722,11 @@ button {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+@media print {
+  .skip-link {
+    display: none !important;
   }
 }
