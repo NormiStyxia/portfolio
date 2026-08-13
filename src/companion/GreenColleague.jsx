@@ -13,6 +13,14 @@ const INTRO_STORAGE_KEY = 'companionIntroSeen';
 const INTRO_IDLE = 'intro-idle';
 const INTRO_DIALOGUE = 'intro-dialogue';
 const INTRO_COMPLETE = 'complete';
+const TAKEOVER_RAISE = 'takeoverRaise';
+const TAKEOVER_LOOP = 'takeoverLoop';
+const TAKEOVER_FINISH = 'takeoverFinish';
+
+const randomBetween = (minimum, maximum) => minimum + Math.random() * (maximum - minimum);
+const clipDuration = (clipName) => (
+  (companionClips[clipName].frames.length / companionClips[clipName].fps) * 1000
+);
 
 function hasSeenCompanionIntro() {
   try {
@@ -42,13 +50,13 @@ function useViewportWidth() {
   return viewportWidth;
 }
 
-function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
+function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion, ambientClipName }) {
   const [reactionClip, setReactionClip] = useState(null);
   const [blinkClip, setBlinkClip] = useState(false);
   const [frameIndex, setFrameIndex] = useState(0);
   const baseClip = movementMode === 'drag' ? 'drag' : movementMode === 'walk' ? 'move' : 'idle';
   const activeClipName = movementMode === 'idle'
-    ? reactionClip || (blinkClip ? 'blink' : baseClip)
+    ? reactionClip || ambientClipName || (blinkClip ? 'blink' : baseClip)
     : baseClip;
   const activeClip = companionClips[activeClipName];
 
@@ -91,13 +99,20 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
   }, [activeClip, blinkClip, reactionClip, reducedMotion]);
 
   useEffect(() => {
-    if (movementMode !== 'idle' || dialogueOpen || reducedMotion || reactionClip || blinkClip) {
+    if (
+      movementMode !== 'idle'
+      || dialogueOpen
+      || reducedMotion
+      || ambientClipName
+      || reactionClip
+      || blinkClip
+    ) {
       return undefined;
     }
 
     const timer = window.setTimeout(() => setBlinkClip(true), 1800 + Math.random() * 2700);
     return () => window.clearTimeout(timer);
-  }, [blinkClip, dialogueOpen, movementMode, reactionClip, reducedMotion]);
+  }, [ambientClipName, blinkClip, dialogueOpen, movementMode, reactionClip, reducedMotion]);
 
   const playTapReaction = () => {
     preloadCompanionClip('tapReactA');
@@ -108,6 +123,7 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
 
   return {
     clip: activeClip,
+    clipName: activeClipName,
     frameSrc: activeClip.frames[Math.min(frameIndex, activeClip.frames.length - 1)],
     playTapReaction,
   };
@@ -185,17 +201,59 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const [introPhase, setIntroPhase] = useState(
     introInitiallySeenRef.current ? INTRO_COMPLETE : INTRO_IDLE,
   );
+  const [ambientClipName, setAmbientClipName] = useState(null);
+  const ambientCooldownRef = useRef(Date.now() + randomBetween(6000, 10000));
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const reducedMotion = useReducedMotion();
   const currentSection = useActivePortfolioSection(sectionTargets);
   const introActive = introPhase !== INTRO_COMPLETE;
-  const movement = useCompanionMovement({ paused: dialogue !== null || introActive, reducedMotion });
+  const movement = useCompanionMovement({
+    paused: dialogue !== null || introActive || ambientClipName !== null,
+    reducedMotion,
+  });
   const viewportWidth = useViewportWidth();
   const animation = useCompanionAnimation({
     movementMode: movement.mode,
     dialogueOpen: dialogue !== null,
     reducedMotion,
+    ambientClipName,
   });
+
+  useEffect(() => {
+    if (reducedMotion || dialogue !== null || introActive || movement.mode !== 'idle') {
+      if (ambientClipName !== null) setAmbientClipName(null);
+      return undefined;
+    }
+
+    let delay;
+    let nextClip;
+
+    if (ambientClipName === TAKEOVER_RAISE) {
+      delay = clipDuration(TAKEOVER_RAISE);
+      nextClip = TAKEOVER_LOOP;
+    } else if (ambientClipName === TAKEOVER_LOOP) {
+      delay = randomBetween(5000, 10000);
+      nextClip = TAKEOVER_FINISH;
+    } else if (ambientClipName === TAKEOVER_FINISH) {
+      delay = clipDuration(TAKEOVER_FINISH);
+      nextClip = null;
+    } else {
+      delay = Math.max(800, ambientCooldownRef.current - Date.now());
+      nextClip = TAKEOVER_RAISE;
+      preloadCompanionClip(TAKEOVER_RAISE);
+      preloadCompanionClip(TAKEOVER_LOOP);
+      preloadCompanionClip(TAKEOVER_FINISH);
+    }
+
+    const timer = window.setTimeout(() => {
+      if (ambientClipName === TAKEOVER_FINISH) {
+        ambientCooldownRef.current = Date.now() + randomBetween(18000, 30000);
+      }
+      setAmbientClipName(nextClip);
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [ambientClipName, dialogue, introActive, movement.mode, reducedMotion]);
 
   const completeIntro = useCallback(() => {
     rememberCompanionIntro();
@@ -253,6 +311,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   }, [completeIntro, dialogue, introActive]);
 
   const openDialogue = () => {
+    setAmbientClipName(null);
     animation.playTapReaction();
     const seenCount = seenCountRef.current[currentSection] || 0;
     setDialogue(getCompanionDialogue(currentSection, seenCount));
@@ -262,6 +321,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const handlePointerDown = (event) => {
     if (event.button !== 0) return;
     const characterBounds = event.currentTarget.getBoundingClientRect();
+    setAmbientClipName(null);
     if (introActive) completeIntro();
     else setDialogue(null);
     suppressClickRef.current = false;
@@ -297,11 +357,9 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     const grabOffsetX = (dragGrab.x - dragClip.footAnchor.x) * frameScale * sourceDirection;
     const grabOffsetY = (dragGrab.y - dragClip.footAnchor.y) * frameScale;
     const desiredRootY = event.clientY - grabOffsetY;
-    const minimumRootY = pointer.spriteHeight + 8;
-    const clampedRootY = Math.max(minimumRootY, Math.min(pointer.baselineRootY, desiredRootY));
 
     movement.dragTo(event.clientX - grabOffsetX);
-    setDragOffsetY(clampedRootY - pointer.baselineRootY);
+    setDragOffsetY(desiredRootY - pointer.baselineRootY);
   };
 
   const finishPointerInteraction = (event) => {
@@ -353,6 +411,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       className="green-colleague"
       data-section={currentSection}
       data-motion={movement.mode}
+      data-clip={animation.clipName}
       data-intro={introPhase}
       ref={rootRef}
       style={{

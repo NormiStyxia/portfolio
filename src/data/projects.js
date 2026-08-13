@@ -34,7 +34,7 @@ const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
  * @property {string[]} contributions
  * @property {string} accent
  * @property {Media} heroMedia
- * @property {{caseStudy?: string, demo?: string, tapTap?: string}} links
+ * @property {{caseStudy?: string, demo?: string, tapTap?: string, tapTapLabel?: string}} links
  */
 
 /** @type {Project[]} */
@@ -171,7 +171,10 @@ export const projects = [
       load: 'interaction',
       tone: 'archive',
     },
-    links: {},
+    links: {
+      tapTap: 'https://maker.taptap.cn/shares/nwvov6',
+      tapTapLabel: 'TapTap试玩',
+    },
   },
 ];
 

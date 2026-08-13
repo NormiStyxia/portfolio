@@ -69,7 +69,7 @@ function ProjectLinks({ project }) {
       {project.links.demo ? <ArrowLink href={project.links.demo} external>Demo</ArrowLink> : null}
       {project.links.tapTap ? (
         <ArrowLink href={project.links.tapTap} external>
-          TapTap
+          {project.links.tapTapLabel || 'TapTap'}
         </ArrowLink>
       ) : null}
     </div>
@@ -164,6 +164,7 @@ function ArchiveProject({ project }) {
           <p className="project-core">{project.coreIdea}</p>
           <ProjectMeta project={project} />
           <p className="design-note">{project.summary}</p>
+          <ProjectLinks project={project} />
         </div>
       </div>
     </article>

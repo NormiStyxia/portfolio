@@ -33,7 +33,7 @@ Source reviewed from `牛顿-maker/scripts/green_assistant/` and the generated r
 - Portable source behavior states: `IDLE`, `WALK/ROAM`, `INTERACT/DIALOGUE`.
 - Game-only source states: `DRAGGING`, `OBSERVE`, `OFFER`, `TAKEOVER`, `SUCCESS`, `DISABLED`.
 - Runtime clips: `idle`, `blink`, `move`, `drag`, `tap_react_a`, `tap_react_b`, `takeover_raise`, `takeover_loop`, `takeover_finish`.
-- Portfolio clips included: `idle`, `blink`, `move`, `drag`, `tap_react_a`, `tap_react_b`.
+- Portfolio clips included: `idle`, `blink`, `move`, `drag`, `tap_react_a`, `tap_react_b`, `takeover_raise`, `takeover_loop`, and `takeover_finish`.
 
 ## Intentionally excluded
 

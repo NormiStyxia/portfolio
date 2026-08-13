@@ -4,6 +4,7 @@ export const companionIntroDialogue = {
     '这里是诺米的个人作品集，下面放着她这段时间做的一些游戏。',
     '我平时负责教程、提示，还有在项目快炸的时候被拖来救场。',
     '看项目的时候有哪里想多知道一点，就戳我。我可以补充说明，也可以带你去别的项目。',
+    '如果我挡到你看文本了，把我拎起来往边上挪挪就好。',
   ],
   showProjectNavigation: false,
   autoAdvance: true,

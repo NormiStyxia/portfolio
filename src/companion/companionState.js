@@ -203,7 +203,6 @@ export function useCompanionMovement({ paused, reducedMotion }) {
     const handleResize = () => {
       const bounds = getBounds();
       if (machine.mode === 'drag') {
-        machine.x = clamp(machine.x, bounds.minimum, bounds.maximum);
         publish();
         return;
       }
@@ -233,9 +232,7 @@ export function useCompanionMovement({ paused, reducedMotion }) {
 
   const dragTo = (x) => {
     const machine = machineRef.current;
-    const bounds = getBounds();
-    const nextX = clamp(x, bounds.minimum, bounds.maximum);
-    machine.x = nextX;
+    machine.x = x;
     machine.mode = 'drag';
     machine.targetX = null;
     setSnapshot({ x: machine.x, mode: 'drag', facing: machine.facing });
