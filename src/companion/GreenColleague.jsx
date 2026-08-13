@@ -27,8 +27,16 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion }) {
   const [blinkClip, setBlinkClip] = useState(false);
   const [frameIndex, setFrameIndex] = useState(0);
   const baseClip = movementMode === 'drag' ? 'drag' : movementMode === 'walk' ? 'move' : 'idle';
-  const activeClipName = reactionClip || (blinkClip ? 'blink' : baseClip);
+  const activeClipName = movementMode === 'idle'
+    ? reactionClip || (blinkClip ? 'blink' : baseClip)
+    : baseClip;
   const activeClip = companionClips[activeClipName];
+
+  useEffect(() => {
+    if (movementMode === 'idle') return;
+    setBlinkClip(false);
+    setReactionClip(null);
+  }, [movementMode]);
 
   useEffect(() => {
     preloadCompanionClip('idle');
