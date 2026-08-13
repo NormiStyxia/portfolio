@@ -23,21 +23,21 @@ function ProjectMeta({ project }) {
   return (
     <dl className="project-meta">
       <div>
-        <dt>{labels.role || 'Role'}</dt>
+        <dt>{labels.role || '职责'}</dt>
         <dd>{project.role.join(' / ')}</dd>
       </div>
       <div>
-        <dt>{labels.duration || 'Duration'}</dt>
+        <dt>{labels.duration || '周期'}</dt>
         <dd>{project.metaDuration || project.duration}</dd>
       </div>
       {project.engine ? (
         <div>
-          <dt>{labels.engine || 'Engine'}</dt>
+          <dt>{labels.engine || '引擎'}</dt>
           <dd>{project.engine}</dd>
         </div>
       ) : null}
       <div>
-        <dt>{labels.context || 'Context'}</dt>
+        <dt>{labels.context || '项目背景'}</dt>
         <dd>{project.context || project.platform || project.year}</dd>
       </div>
     </dl>
