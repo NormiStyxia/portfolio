@@ -98,7 +98,7 @@ function SecondaryProject({ project, reverse = false }) {
 
   return (
     <article
-      className={`project project--secondary ${reverse ? 'project--reverse' : ''}`}
+      className={`project project--secondary ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${reverse ? 'project--reverse' : ''}`}
       id={project.id}
       style={{ '--project-accent': project.accent }}
     >
