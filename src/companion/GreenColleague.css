@@ -5,6 +5,12 @@
   z-index: 24;
   inset: 0;
   pointer-events: none;
+  animation: green-colleague-enter 200ms var(--ease-out) both;
+}
+
+@keyframes green-colleague-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .green-colleague__character {
@@ -40,6 +46,7 @@
 }
 
 .green-colleague__sprite {
+  --companion-facing: 1;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -48,7 +55,9 @@
   max-width: none;
   object-fit: contain;
   pointer-events: none;
+  transform: scaleX(var(--companion-facing)) scale(1);
   transform-origin: var(--foot-origin) 100%;
+  transition: transform 160ms var(--ease-out);
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -60,7 +69,12 @@
 }
 
 .green-colleague__sprite[data-facing='right'] {
-  transform: scaleX(-1);
+  --companion-facing: -1;
+}
+
+.green-colleague[data-motion='drag'] .green-colleague__sprite {
+  transform: scaleX(var(--companion-facing)) scale(1.015);
+  transition: none;
 }
 
 .green-colleague__bubble {
@@ -84,10 +98,28 @@
   padding: 0.9rem 2.5rem 0.85rem 1rem;
   pointer-events: auto;
   scrollbar-width: thin;
+  animation: green-colleague-bubble-in 220ms var(--ease-out) both;
+}
+
+@keyframes green-colleague-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .green-colleague__lines p {
   margin: 0;
+  animation: green-colleague-line-in 180ms var(--ease-out) both;
+}
+
+@keyframes green-colleague-line-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .green-colleague__lines p + p {
@@ -232,8 +264,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .green-colleague,
+  .green-colleague__bubble,
+  .green-colleague__lines p,
   .green-colleague__character,
   .green-colleague__sprite {
+    animation: none;
     transition: none;
   }
 }

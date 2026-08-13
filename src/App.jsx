@@ -5,6 +5,7 @@ import { MediaFigure } from './components/MediaFigure.jsx';
 import { GreenColleague } from './companion/GreenColleague.jsx';
 import { projects } from './data/projects.js';
 import { site } from './data/site.js';
+import { useReveal } from './motion/useReveal.js';
 
 const companionSections = [
   { context: 'hero', id: 'hero', label: '首页' },
@@ -115,8 +116,15 @@ function ProjectLinks({ project }) {
 }
 
 function FlagshipProject({ project }) {
+  const motion = useReveal();
+
   return (
-    <article className="project project--flagship project--newton" id={project.id} style={{ '--project-accent': project.accent }}>
+    <article
+      className={`project project--flagship project--newton motion-section ${motion.revealed ? 'is-revealed' : ''}`}
+      id={project.id}
+      ref={motion.ref}
+      style={{ '--project-accent': project.accent }}
+    >
       <div className="project-rule">
         <span>Project {project.index}</span>
         <span>Flagship / {project.year}</span>
@@ -149,11 +157,13 @@ function FlagshipProject({ project }) {
 
 function SecondaryProject({ project, reverse = false }) {
   const hasDesignNote = project.id === 'anchor-maze' || project.id === 'crimson-leap';
+  const motion = useReveal();
 
   return (
     <article
-      className={`project project--secondary ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${project.id === 'crimson-leap' ? 'project--crimson' : ''} ${reverse ? 'project--reverse' : ''}`}
+      className={`project project--secondary motion-section ${motion.revealed ? 'is-revealed' : ''} ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${project.id === 'crimson-leap' ? 'project--crimson' : ''} ${reverse ? 'project--reverse' : ''}`}
       id={project.id}
+      ref={motion.ref}
       style={{ '--project-accent': project.accent }}
     >
       <div className="project-rule">
@@ -188,8 +198,18 @@ function SecondaryProject({ project, reverse = false }) {
 }
 
 function ArchiveProject({ project }) {
+  const motion = useReveal();
+
   return (
-    <article className="project project--archive project--realmwalker" id={project.id} style={{ '--project-accent': project.accent }}>
+    <article
+      className={`project project--archive project--realmwalker motion-section ${motion.revealed ? 'is-revealed' : ''}`}
+      id={project.id}
+      ref={motion.ref}
+      style={{ '--project-accent': project.accent }}
+    >
+      <svg className="realmwalker-trace" viewBox="0 0 420 90" aria-hidden="true" focusable="false">
+        <path d="M4 75 C 90 4, 220 8, 416 65" />
+      </svg>
       <div className="project-rule">
         <span>Project {project.index}</span>
         <span>Archive / Origin</span>
@@ -214,6 +234,9 @@ function App() {
   const [bootstrapPhase, setBootstrapPhase] = useState('loading');
   const revealPortfolio = useCallback(() => setBootstrapPhase('revealing'), []);
   const completeBootstrap = useCallback(() => setBootstrapPhase('ready'), []);
+  const selectedMotion = useReveal({ threshold: 0.12 });
+  const aboutMotion = useReveal({ threshold: 0.12 });
+  const footerMotion = useReveal({ threshold: 0.05, rootMargin: '0px' });
 
   return (
     <div className="portfolio-app" data-bootstrap={bootstrapPhase}>
@@ -226,7 +249,7 @@ function App() {
         />
       ) : null}
       <div className="site" id="top">
-        <GlobalNavigation name={site.name} />
+        <GlobalNavigation name={site.name} motionReady={bootstrapPhase !== 'loading'} />
 
         <main id="main-content">
           <section className="hero shell" id="hero" aria-labelledby="hero-title">
@@ -245,7 +268,7 @@ function App() {
             {site.roles.map((role, index) => (
               <p key={role}>
                 <span>0{index + 1}</span>
-                {role}
+                <span className="hero__role-label">{role}</span>
               </p>
             ))}
           </div>
@@ -267,7 +290,10 @@ function App() {
           </section>
 
         <section className="selected-works shell" id="selected-works" aria-label="代表作品">
-          <header className="section-intro">
+          <header
+            className={`section-intro motion-section ${selectedMotion.revealed ? 'is-revealed' : ''}`}
+            ref={selectedMotion.ref}
+          >
             <p className="eyebrow">01–04 / SELECTED</p>
             <p>这几个项目做法都不太一样：有的从规则出发，有的从视觉和数据结构出发。对我来说，它们都是把一个奇怪想法一路做成能玩的东西。</p>
           </header>
@@ -278,7 +304,12 @@ function App() {
           <ArchiveProject project={archive} />
         </section>
 
-        <section className="about shell" id="about" aria-labelledby="about-title">
+        <section
+          className={`about shell motion-section ${aboutMotion.revealed ? 'is-revealed' : ''}`}
+          id="about"
+          aria-labelledby="about-title"
+          ref={aboutMotion.ref}
+        >
           <div className="about__heading">
             <p className="eyebrow">About / Contact</p>
             <h2 id="about-title">关于我</h2>
@@ -300,7 +331,10 @@ function App() {
         </section>
         </main>
 
-        <footer className="site-footer">
+        <footer
+          className={`site-footer motion-section ${footerMotion.revealed ? 'is-revealed' : ''}`}
+          ref={footerMotion.ref}
+        >
           <div className="shell site-footer__inner">
             <p>诺米Styxia / Game Design Portfolio</p>
             <p>Game Design / Visual / AI-native</p>

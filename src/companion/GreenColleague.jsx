@@ -166,7 +166,7 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, onCompl
         ×
       </button>
       <div className="green-colleague__lines">
-        <p>{dialogue.lines[lineIndex]}</p>
+        <p key={`${dialogue.id || 'dialogue'}-${lineIndex}`}>{dialogue.lines[lineIndex]}</p>
       </div>
       {!isLastLine ? (
         <button
