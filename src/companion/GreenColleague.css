@@ -21,7 +21,7 @@
   cursor: grab;
   pointer-events: auto;
   touch-action: none;
-  transform: translateY(var(--companion-drag-offset-y, 0));
+  transform: translateY(0);
   transition: transform 160ms var(--ease-out);
 }
 
@@ -55,6 +55,7 @@
 
 .green-colleague[data-motion='drag'] .green-colleague__character {
   cursor: grabbing;
+  transform: translateY(var(--companion-drag-offset-y, 0));
   transition: none;
 }
 

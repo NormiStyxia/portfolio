@@ -84,13 +84,28 @@ export const companionClips = {
   },
 };
 
+const clipPreloadCache = new Map();
+const clipImageCache = new Map();
+
 export function preloadCompanionClip(clipName) {
   const clip = companionClips[clipName];
-  if (!clip || typeof Image === 'undefined') return;
+  if (!clip || typeof Image === 'undefined') return Promise.resolve();
+  if (clipPreloadCache.has(clipName)) return clipPreloadCache.get(clipName);
 
-  clip.frames.forEach((src) => {
+  const images = clip.frames.map((src) => {
     const image = new Image();
     image.decoding = 'async';
-    image.src = src;
+    return { image, src };
   });
+  clipImageCache.set(clipName, images.map(({ image }) => image));
+
+  const preload = Promise.all(images.map(({ image, src }) => new Promise((resolve) => {
+    const finish = () => resolve();
+    image.addEventListener('load', finish, { once: true });
+    image.addEventListener('error', finish, { once: true });
+    image.src = src;
+  })));
+
+  clipPreloadCache.set(clipName, preload);
+  return preload;
 }

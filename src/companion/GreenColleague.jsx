@@ -190,6 +190,7 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, onCompl
 
 export function GreenColleague({ sectionTargets, projectAnchors }) {
   const rootRef = useRef(null);
+  const characterRef = useRef(null);
   const introInitiallySeenRef = useRef(null);
   if (introInitiallySeenRef.current === null) {
     introInitiallySeenRef.current = hasSeenCompanionIntro();
@@ -204,11 +205,12 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const [ambientClipName, setAmbientClipName] = useState(null);
   const ambientCooldownRef = useRef(Date.now() + randomBetween(6000, 10000));
   const [dragOffsetY, setDragOffsetY] = useState(0);
+  const [locomotionReady, setLocomotionReady] = useState(false);
   const reducedMotion = useReducedMotion();
   const currentSection = useActivePortfolioSection(sectionTargets);
   const introActive = introPhase !== INTRO_COMPLETE;
   const movement = useCompanionMovement({
-    paused: dialogue !== null || introActive || ambientClipName !== null,
+    paused: dialogue !== null || introActive || ambientClipName !== null || !locomotionReady,
     reducedMotion,
   });
   const viewportWidth = useViewportWidth();
@@ -218,6 +220,56 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     reducedMotion,
     ambientClipName,
   });
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      preloadCompanionClip('idle'),
+      preloadCompanionClip('move'),
+      preloadCompanionClip('drag'),
+    ]).then(() => {
+      if (active) setLocomotionReady(true);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const settlePointerInteraction = useCallback((pointerId = null) => {
+    const pointer = pointerRef.current;
+    if (!pointer || (pointerId !== null && pointer.id !== pointerId)) return false;
+
+    pointerRef.current = null;
+    if (characterRef.current?.hasPointerCapture?.(pointer.id)) {
+      characterRef.current.releasePointerCapture?.(pointer.id);
+    }
+    if (pointer.dragging) {
+      suppressClickRef.current = true;
+      movement.endDrag();
+    }
+    setDragOffsetY(0);
+    return pointer.dragging;
+  }, [movement.endDrag]);
+
+  useEffect(() => {
+    const finishPointer = (event) => settlePointerInteraction(event.pointerId);
+    const finishInterruptedPointer = () => settlePointerInteraction();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') finishInterruptedPointer();
+    };
+
+    window.addEventListener('pointerup', finishPointer, true);
+    window.addEventListener('pointercancel', finishPointer, true);
+    window.addEventListener('blur', finishInterruptedPointer);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('pointerup', finishPointer, true);
+      window.removeEventListener('pointercancel', finishPointer, true);
+      window.removeEventListener('blur', finishInterruptedPointer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [settlePointerInteraction]);
 
   useEffect(() => {
     if (reducedMotion || dialogue !== null || introActive || movement.mode !== 'idle') {
@@ -363,18 +415,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   };
 
   const finishPointerInteraction = (event) => {
-    const pointer = pointerRef.current;
-    if (!pointer || pointer.id !== event.pointerId) return;
-    pointerRef.current = null;
-
-    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture?.(event.pointerId);
-    }
-    if (pointer.dragging) {
-      suppressClickRef.current = true;
-      movement.endDrag();
-      setDragOffsetY(0);
-    }
+    settlePointerInteraction(event.pointerId);
   };
 
   const handleCharacterClick = () => {
@@ -436,6 +477,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
 
       <button
         className="green-colleague__character"
+        ref={characterRef}
         type="button"
         style={spriteStyle}
         onClick={handleCharacterClick}
