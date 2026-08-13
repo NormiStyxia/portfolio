@@ -88,12 +88,12 @@
 }
 
 .hero h1 {
-  clip-path: inset(0 100% 0 0);
+  clip-path: inset(-0.2em 100% -0.22em -0.18em);
   transition: clip-path 680ms var(--ease-out);
 }
 
 .portfolio-app:not([data-bootstrap='loading']) .hero h1 {
-  clip-path: inset(0 0 0 0);
+  clip-path: inset(-0.2em -0.22em -0.22em -0.18em);
   transition-delay: 80ms;
 }
 
@@ -296,12 +296,12 @@
 .motion-section .project-links { transition-delay: 330ms; }
 
 .motion-section.project h3 {
-  clip-path: inset(0 100% 0 0);
+  clip-path: inset(-0.2em 100% -0.22em -0.18em);
   transition: clip-path 680ms var(--ease-out);
 }
 
 .motion-section.project.is-revealed h3 {
-  clip-path: inset(0 0 0 0);
+  clip-path: inset(-0.2em -0.22em -0.22em -0.18em);
   transition-delay: 110ms;
 }
 
@@ -435,13 +435,13 @@
 }
 
 .motion-section.about h2 {
-  clip-path: inset(0 100% 0 0);
+  clip-path: inset(-0.2em 100% -0.22em -0.18em);
   transform: none;
   transition: opacity 440ms var(--ease-out), clip-path 680ms var(--ease-out);
 }
 
 .motion-section.about.is-revealed h2 {
-  clip-path: inset(0 0 0 0);
+  clip-path: inset(-0.2em -0.22em -0.22em -0.18em);
   transition-delay: 60ms;
 }
 
