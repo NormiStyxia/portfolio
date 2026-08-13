@@ -571,6 +571,8 @@ button {
 .project-evidence > p {
   max-width: 34rem;
   margin: 0;
+  font-family: var(--font-cn-body);
+  font-weight: 400;
   font-size: clamp(1.05rem, 1.5vw, 1.3rem);
 }
 
