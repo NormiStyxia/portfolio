@@ -1,6 +1,6 @@
 import { companionClips, preloadCompanionClip } from '../companion/companionAssets.js';
 
-const FAIL_OPEN_MS = 5500;
+const FAIL_OPEN_MS = 12000;
 
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
@@ -61,7 +61,7 @@ async function loadPortfolioFonts() {
 
 async function prepareCompanionRuntime(assetPromises) {
   await Promise.allSettled(assetPromises);
-  const requiredClips = ['idle', 'move', 'tapReactA', 'tapReactB'];
+  const requiredClips = Object.keys(companionClips);
   const invalidClip = requiredClips.find((name) => !companionClips[name]?.frames?.length);
   if (invalidClip) throw new Error(`Companion clip unavailable: ${invalidClip}`);
   await nextFrame();
@@ -86,16 +86,10 @@ async function waitForStableLayout(dependencies) {
 export async function bootstrapPortfolio({ heroImage, firstMedia, onProgress }) {
   const fontsReady = loadPortfolioFonts();
   const heroAssetsReady = decodeImage(heroImage);
-  const companionIdleReady = preloadCompanionClip('idle');
-  const companionWalkReady = preloadCompanionClip('move');
-  const companionClickAReady = preloadCompanionClip('tapReactA');
-  const companionClickBReady = preloadCompanionClip('tapReactB');
-  const companionRuntimeReady = prepareCompanionRuntime([
-    companionIdleReady,
-    companionWalkReady,
-    companionClickAReady,
-    companionClickBReady,
-  ]);
+  const companionClipReady = Object.fromEntries(
+    Object.keys(companionClips).map((clipName) => [clipName, preloadCompanionClip(clipName)]),
+  );
+  const companionRuntimeReady = prepareCompanionRuntime(Object.values(companionClipReady));
   const firstPosterReady = decodeImage(firstMedia?.poster);
   const firstMediaReady = loadVideoMetadata(firstMedia);
   const layoutReady = waitForStableLayout([
@@ -108,10 +102,10 @@ export async function bootstrapPortfolio({ heroImage, firstMedia, onProgress }) 
   const checkpoints = [
     ['fontsReady', fontsReady],
     ['heroAssetsReady', heroAssetsReady],
-    ['companionIdleReady', companionIdleReady],
-    ['companionWalkReady', companionWalkReady],
-    ['companionClickAReady', companionClickAReady],
-    ['companionClickBReady', companionClickBReady],
+    ...Object.entries(companionClipReady).map(([clipName, promise]) => [
+      `companion:${clipName}`,
+      promise,
+    ]),
     ['companionRuntimeReady', companionRuntimeReady],
     ['firstPosterReady', firstPosterReady],
     ['firstMediaReady', firstMediaReady],

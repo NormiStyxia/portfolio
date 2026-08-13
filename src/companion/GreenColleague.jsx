@@ -474,7 +474,6 @@ export function GreenColleague({ currentSection, sectionTargets, projectAnchors 
         aria-expanded={dialogue !== null}
       >
         <img
-          key={animation.clipName}
           className="green-colleague__sprite"
           src={animation.frameSrc}
           width={clip.frameWidth}
