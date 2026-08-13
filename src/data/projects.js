@@ -63,7 +63,7 @@ export const projects = [
       width: 1280,
       height: 568,
       aspectRatio: '160 / 71',
-      load: 'interaction',
+      load: 'eager',
       tone: 'newton',
     },
     links: {

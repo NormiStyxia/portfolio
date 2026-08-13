@@ -1,3 +1,5 @@
+import { useCallback, useState } from 'react';
+import { PortfolioLoader } from './bootstrap/PortfolioLoader.jsx';
 import { GlobalNavigation } from './components/GlobalNavigation.jsx';
 import { MediaFigure } from './components/MediaFigure.jsx';
 import { GreenColleague } from './companion/GreenColleague.jsx';
@@ -173,9 +175,20 @@ function ArchiveProject({ project }) {
 
 function App() {
   const [newton, anchor, crimson, archive] = projects;
+  const [bootstrapPhase, setBootstrapPhase] = useState('loading');
+  const revealPortfolio = useCallback(() => setBootstrapPhase('revealing'), []);
+  const completeBootstrap = useCallback(() => setBootstrapPhase('ready'), []);
 
   return (
-    <>
+    <div className="portfolio-app" data-bootstrap={bootstrapPhase}>
+      {bootstrapPhase !== 'ready' ? (
+        <PortfolioLoader
+          heroImage={site.avatar}
+          firstMedia={newton.heroMedia}
+          onReveal={revealPortfolio}
+          onComplete={completeBootstrap}
+        />
+      ) : null}
       <div className="site" id="top">
         <GlobalNavigation name={site.name} />
 
@@ -263,11 +276,13 @@ function App() {
         </footer>
       </div>
 
-      <GreenColleague
-        sectionTargets={companionSections}
-        projectAnchors={companionProjectAnchors}
-      />
-    </>
+      {bootstrapPhase === 'ready' ? (
+        <GreenColleague
+          sectionTargets={companionSections}
+          projectAnchors={companionProjectAnchors}
+        />
+      ) : null}
+    </div>
   );
 }
 
