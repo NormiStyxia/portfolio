@@ -300,6 +300,11 @@
   transition: clip-path 680ms var(--ease-out);
 }
 
+.motion-section.project--anchor h3 {
+  width: max-content;
+  max-width: none;
+}
+
 .motion-section.project.is-revealed h3 {
   clip-path: inset(-0.2em -0.22em -0.22em -0.18em);
   transition-delay: 110ms;
