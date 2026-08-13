@@ -54,6 +54,7 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion, ambi
   const [reactionClip, setReactionClip] = useState(null);
   const [blinkClip, setBlinkClip] = useState(false);
   const [frameIndex, setFrameIndex] = useState(0);
+  const reactionRequestRef = useRef(0);
   const baseClip = movementMode === 'drag' ? 'drag' : movementMode === 'walk' ? 'move' : 'idle';
   const activeClipName = movementMode === 'idle'
     ? reactionClip || ambientClipName || (blinkClip ? 'blink' : baseClip)
@@ -62,6 +63,7 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion, ambi
 
   useEffect(() => {
     if (movementMode === 'idle') return;
+    reactionRequestRef.current += 1;
     setBlinkClip(false);
     setReactionClip(null);
   }, [movementMode]);
@@ -115,10 +117,13 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion, ambi
   }, [ambientClipName, blinkClip, dialogueOpen, movementMode, reactionClip, reducedMotion]);
 
   const playTapReaction = () => {
-    preloadCompanionClip('tapReactA');
-    preloadCompanionClip('tapReactB');
+    const clipName = reactionClips[Math.floor(Math.random() * reactionClips.length)];
+    const requestId = reactionRequestRef.current + 1;
+    reactionRequestRef.current = requestId;
     setBlinkClip(false);
-    setReactionClip(reactionClips[Math.floor(Math.random() * reactionClips.length)]);
+    preloadCompanionClip(clipName).then(() => {
+      if (reactionRequestRef.current === requestId) setReactionClip(clipName);
+    });
   };
 
   return {
@@ -297,14 +302,20 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       preloadCompanionClip(TAKEOVER_FINISH);
     }
 
-    const timer = window.setTimeout(() => {
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      if (nextClip) await preloadCompanionClip(nextClip);
+      if (cancelled) return;
       if (ambientClipName === TAKEOVER_FINISH) {
         ambientCooldownRef.current = Date.now() + randomBetween(18000, 30000);
       }
       setAmbientClipName(nextClip);
     }, delay);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [ambientClipName, dialogue, introActive, movement.mode, reducedMotion]);
 
   const completeIntro = useCallback(() => {
@@ -499,10 +510,14 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
         aria-expanded={dialogue !== null}
       >
         <img
+          key={animation.clipName}
           className="green-colleague__sprite"
           src={animation.frameSrc}
+          width={clip.frameWidth}
+          height={clip.frameHeight}
           alt=""
           aria-hidden="true"
+          decoding="async"
           draggable="false"
           data-facing={movement.facing}
         />

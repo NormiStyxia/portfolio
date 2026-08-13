@@ -100,9 +100,15 @@ export function preloadCompanionClip(clipName) {
   clipImageCache.set(clipName, images.map(({ image }) => image));
 
   const preload = Promise.all(images.map(({ image, src }) => new Promise((resolve) => {
-    const finish = () => resolve();
-    image.addEventListener('load', finish, { once: true });
-    image.addEventListener('error', finish, { once: true });
+    image.addEventListener('load', async () => {
+      try {
+        await image.decode();
+      } catch {
+        // A loaded frame is still usable when explicit decoding is unavailable.
+      }
+      resolve();
+    }, { once: true });
+    image.addEventListener('error', resolve, { once: true });
     image.src = src;
   })));
 
