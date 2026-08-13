@@ -134,26 +134,13 @@ function useCompanionAnimation({ movementMode, dialogueOpen, reducedMotion, ambi
   };
 }
 
-function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, onComplete, style }) {
+function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }) {
   const [lineIndex, setLineIndex] = useState(0);
   const isLastLine = lineIndex === dialogue.lines.length - 1;
 
   useEffect(() => {
     setLineIndex(0);
   }, [dialogue]);
-
-  useEffect(() => {
-    if (!dialogue.autoAdvance) return undefined;
-
-    const line = dialogue.lines[lineIndex] || '';
-    const delay = Math.min(4300, 1500 + line.length * 55);
-    const timer = window.setTimeout(() => {
-      if (isLastLine) onComplete?.();
-      else setLineIndex((current) => current + 1);
-    }, delay);
-
-    return () => window.clearTimeout(timer);
-  }, [dialogue, isLastLine, lineIndex, onComplete]);
 
   return (
     <section
@@ -162,7 +149,7 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, onCompl
       aria-live="polite"
       style={style}
     >
-      <button className="green-colleague__close" type="button" onClick={onClose} aria-label="收起对话">
+      <button className="green-colleague__close" type="button" onClick={onClose} aria-label="关闭绿毛同事对话">
         ×
       </button>
       <div className="green-colleague__lines">
@@ -318,60 +305,19 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     };
   }, [ambientClipName, dialogue, introActive, movement.mode, reducedMotion]);
 
-  const completeIntro = useCallback(() => {
+  const closeDialogue = useCallback(() => {
+    if (introPhase === INTRO_DIALOGUE) {
+      setIntroPhase(INTRO_COMPLETE);
+    }
+    setDialogue(null);
+  }, [introPhase]);
+
+  const startIntro = useCallback(() => {
     rememberCompanionIntro();
     seenCountRef.current.hero = Math.max(1, seenCountRef.current.hero || 0);
-    setIntroPhase(INTRO_COMPLETE);
-    setDialogue(null);
+    setIntroPhase(INTRO_DIALOGUE);
+    setDialogue(companionIntroDialogue);
   }, []);
-
-  useEffect(() => {
-    if (introPhase !== INTRO_IDLE) return undefined;
-    if (currentSection !== 'hero') {
-      completeIntro();
-      return undefined;
-    }
-
-    const timer = window.setTimeout(() => {
-      rememberCompanionIntro();
-      setDialogue(companionIntroDialogue);
-      setIntroPhase(INTRO_DIALOGUE);
-    }, 700);
-
-    return () => window.clearTimeout(timer);
-  }, [completeIntro, currentSection, introPhase]);
-
-  useEffect(() => {
-    if (introActive) {
-      if (currentSection !== 'hero') completeIntro();
-      return;
-    }
-    setDialogue(null);
-  }, [completeIntro, currentSection, introActive]);
-
-  useEffect(() => {
-    if (!dialogue) return undefined;
-
-    const handlePointerDown = (event) => {
-      if (!rootRef.current?.contains(event.target)) {
-        if (introActive) completeIntro();
-        else setDialogue(null);
-      }
-    };
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        if (introActive) completeIntro();
-        else setDialogue(null);
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [completeIntro, dialogue, introActive]);
 
   const openDialogue = () => {
     setAmbientClipName(null);
@@ -385,8 +331,6 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     if (event.button !== 0) return;
     const characterBounds = event.currentTarget.getBoundingClientRect();
     setAmbientClipName(null);
-    if (introActive) completeIntro();
-    else setDialogue(null);
     suppressClickRef.current = false;
     pointerRef.current = {
       id: event.pointerId,
@@ -434,6 +378,14 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       suppressClickRef.current = false;
       return;
     }
+    if (dialogue !== null) {
+      animation.playTapReaction();
+      return;
+    }
+    if (introPhase === INTRO_IDLE) {
+      startIntro();
+      return;
+    }
     openDialogue();
   };
 
@@ -476,8 +428,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
           dialogue={dialogue}
           projectAnchors={projectAnchors}
           onNavigate={navigateToProject}
-          onClose={introActive ? completeIntro : () => setDialogue(null)}
-          onComplete={introActive ? completeIntro : undefined}
+          onClose={closeDialogue}
           style={{
             '--bubble-left': `${bubbleMetrics.left}px`,
             '--bubble-width': `${bubbleMetrics.width}px`,
