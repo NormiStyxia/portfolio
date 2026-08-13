@@ -179,14 +179,16 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
 
   const handlePointerDown = (event) => {
     if (event.button !== 0) return;
+    const characterBounds = event.currentTarget.getBoundingClientRect();
     setDialogue(null);
     suppressClickRef.current = false;
     pointerRef.current = {
       id: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      grabOffsetX: movement.x - event.clientX,
-      buttonTop: event.currentTarget.getBoundingClientRect().top,
+      baselineRootY: characterBounds.bottom,
+      spriteHeight: characterBounds.height,
+      facing: movement.facing,
       dragging: false,
     };
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -205,9 +207,18 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     if (!pointer.dragging) return;
 
     event.preventDefault();
-    movement.dragTo(event.clientX + pointer.grabOffsetX);
-    const maximumLift = Math.max(0, pointer.buttonTop - 8);
-    setDragOffsetY(Math.max(-maximumLift, Math.min(0, event.clientY - pointer.startY)));
+    const dragClip = companionClips.drag;
+    const dragGrab = dragClip.semanticAnchors.dragGrab;
+    const frameScale = pointer.spriteHeight / dragClip.frameHeight;
+    const sourceDirection = pointer.facing === dragClip.sourceFacing ? 1 : -1;
+    const grabOffsetX = (dragGrab.x - dragClip.footAnchor.x) * frameScale * sourceDirection;
+    const grabOffsetY = (dragGrab.y - dragClip.footAnchor.y) * frameScale;
+    const desiredRootY = event.clientY - grabOffsetY;
+    const minimumRootY = pointer.spriteHeight + 8;
+    const clampedRootY = Math.max(minimumRootY, Math.min(pointer.baselineRootY, desiredRootY));
+
+    movement.dragTo(event.clientX - grabOffsetX);
+    setDragOffsetY(clampedRootY - pointer.baselineRootY);
   };
 
   const finishPointerInteraction = (event) => {

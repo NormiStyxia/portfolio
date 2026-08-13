@@ -10,6 +10,7 @@ Source reviewed from `牛顿-maker/scripts/green_assistant/` and the generated r
 - The current frame source faces left; right-facing movement reuses the same frames with a horizontal mirror.
 - Position is owned by a single foot/root coordinate and clamped to a safe horizontal zone.
 - A pointer interaction interrupts walking before playing one of the two original tap reactions.
+- Dragging uses the source `dragGrab` semantic anchor at the cape tip; mirrored facing mirrors the hotspot around the foot/root instead of changing direction during the gesture.
 - `idle`, `blink`, `move`, `tap_react_a`, and `tap_react_b` keep their original FPS, loop rules, frame sizes, and foot anchors.
 
 ## UrhoX / NVG / Lua runtime dependencies

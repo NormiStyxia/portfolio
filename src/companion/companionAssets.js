@@ -37,6 +37,10 @@ export const companionClips = {
     frameWidth: 360,
     frameHeight: 512,
     footAnchor: { x: 208, y: 512 },
+    semanticAnchors: {
+      dragGrab: { x: 241.65925925925927, y: 87.22962962962963 },
+    },
+    sourceFacing: 'left',
   },
   tapReactA: {
     frames: framePaths('tap_react_a', 16),
