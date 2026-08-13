@@ -233,9 +233,6 @@ export function useCompanionMovement({ paused, reducedMotion }) {
     const machine = machineRef.current;
     const bounds = getBounds();
     const nextX = clamp(x, bounds.minimum, bounds.maximum);
-    if (Math.abs(nextX - machine.x) > 0.1) {
-      machine.facing = nextX > machine.x ? 'right' : 'left';
-    }
     machine.x = nextX;
     machine.mode = 'drag';
     machine.targetX = null;

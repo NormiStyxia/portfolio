@@ -36,7 +36,7 @@ Source reviewed from `牛顿-maker/scripts/green_assistant/` and the generated r
 
 ## Intentionally excluded
 
-- Free vertical dragging and out-of-zone relocation effects: the portfolio version keeps the original drag pose, but constrains relocation to the shared bottom baseline and clamps the released horizontal position to the safe viewport bounds.
+- Out-of-zone relocation effects: the portfolio version keeps the original drag pose and allows free in-viewport dragging without changing facing. On release it preserves the clamped horizontal position and settles vertically back to the shared bottom baseline.
 - Failure thresholds, tutorial observation, standard-solution replay, player-input locking, and Computer Use/takeover behavior.
 - UrhoX/NVG renderer code, game event subscriptions, level IDs, and NEWTONignore-specific adapters.
 - Takeover animation clips and gameplay choice UI. Extension points remain at the section-context and navigation bridge instead.

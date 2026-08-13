@@ -21,6 +21,8 @@
   cursor: grab;
   pointer-events: auto;
   touch-action: none;
+  transform: translateY(var(--companion-drag-offset-y, 0));
+  transition: transform 160ms var(--ease-out);
 }
 
 .green-colleague__character:focus-visible {
@@ -53,6 +55,7 @@
 
 .green-colleague[data-motion='drag'] .green-colleague__character {
   cursor: grabbing;
+  transition: none;
 }
 
 .green-colleague__sprite[data-facing='right'] {

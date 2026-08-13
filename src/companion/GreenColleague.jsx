@@ -137,6 +137,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const pointerRef = useRef(null);
   const suppressClickRef = useRef(false);
   const [dialogue, setDialogue] = useState(null);
+  const [dragOffsetY, setDragOffsetY] = useState(0);
   const reducedMotion = useReducedMotion();
   const currentSection = useActivePortfolioSection(sectionTargets);
   const movement = useCompanionMovement({ paused: dialogue !== null, reducedMotion });
@@ -185,6 +186,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       startX: event.clientX,
       startY: event.clientY,
       grabOffsetX: movement.x - event.clientX,
+      buttonTop: event.currentTarget.getBoundingClientRect().top,
       dragging: false,
     };
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -204,11 +206,14 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
 
     event.preventDefault();
     movement.dragTo(event.clientX + pointer.grabOffsetX);
+    const maximumLift = Math.max(0, pointer.buttonTop - 8);
+    setDragOffsetY(Math.max(-maximumLift, Math.min(0, event.clientY - pointer.startY)));
   };
 
   const finishPointerInteraction = (event) => {
     const pointer = pointerRef.current;
     if (!pointer || pointer.id !== event.pointerId) return;
+    pointerRef.current = null;
 
     if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
       event.currentTarget.releasePointerCapture?.(event.pointerId);
@@ -216,8 +221,8 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
     if (pointer.dragging) {
       suppressClickRef.current = true;
       movement.endDrag();
+      setDragOffsetY(0);
     }
-    pointerRef.current = null;
   };
 
   const handleCharacterClick = () => {
@@ -255,7 +260,10 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
       data-section={currentSection}
       data-motion={movement.mode}
       ref={rootRef}
-      style={{ '--companion-x': `${movement.x}px` }}
+      style={{
+        '--companion-x': `${movement.x}px`,
+        '--companion-drag-offset-y': `${dragOffsetY}px`,
+      }}
     >
       {dialogue ? (
         <DialogueBubble
@@ -280,6 +288,7 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointerInteraction}
         onPointerCancel={finishPointerInteraction}
+        onLostPointerCapture={finishPointerInteraction}
         onPointerEnter={() => {
           preloadCompanionClip('tapReactA');
           preloadCompanionClip('tapReactB');
