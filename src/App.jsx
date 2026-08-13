@@ -5,19 +5,28 @@ import { MediaFigure } from './components/MediaFigure.jsx';
 import { GreenColleague } from './companion/GreenColleague.jsx';
 import { projects } from './data/projects.js';
 import { site } from './data/site.js';
-import { useReveal } from './motion/useReveal.js';
+import { useSectionMotion } from './motion/useSectionMotion.js';
+import { useActivePortfolioSection } from './navigation/useActivePortfolioSection.js';
 
-const companionSections = [
-  { context: 'hero', id: 'hero', label: '首页' },
+const portfolioSections = [
+  { context: 'hero', id: 'hero', label: '首页', dialogueContext: 'hero' },
+  { context: 'selected', id: 'selected-intro', label: '代表作品', dialogueContext: 'hero' },
   { context: 'newton', id: 'newton-ignore', label: '不经典力学' },
   { context: 'anchor', id: 'anchor-maze', label: 'Anchor Maze' },
   { context: 'crimson', id: 'crimson-leap', label: '绯红之跃' },
   { context: 'realmwalker', id: 'realm-walker-prologue', label: '幻界行者·序章' },
-  { context: 'about', id: 'about', label: '关于' },
+  { context: 'about', id: 'about', label: '关于', dialogueContext: 'about' },
+  {
+    context: 'footer',
+    id: 'footer',
+    label: '页尾',
+    dialogueContext: 'about',
+    scoreBoost: 0.16,
+  },
 ];
 
-const companionProjectAnchors = companionSections
-  .filter(({ context }) => !['hero', 'about'].includes(context))
+const companionProjectAnchors = portfolioSections
+  .filter(({ context }) => ['newton', 'anchor', 'crimson', 'realmwalker'].includes(context))
   .map(({ id, label }) => ({ id, label }));
 
 const externalProps = {
@@ -115,14 +124,15 @@ function ProjectLinks({ project }) {
   );
 }
 
-function FlagshipProject({ project }) {
-  const motion = useReveal();
+function FlagshipProject({ project, activeSection }) {
+  const motion = useSectionMotion('newton', activeSection);
 
   return (
     <article
       className={`project project--flagship project--newton motion-section ${motion.revealed ? 'is-revealed' : ''}`}
       id={project.id}
-      ref={motion.ref}
+      data-motion-active={motion.isActive}
+      data-motion-epoch={motion.epoch}
       style={{ '--project-accent': project.accent }}
     >
       <div className="project-rule">
@@ -155,15 +165,17 @@ function FlagshipProject({ project }) {
   );
 }
 
-function SecondaryProject({ project, reverse = false }) {
+function SecondaryProject({ project, activeSection, reverse = false }) {
   const hasDesignNote = project.id === 'anchor-maze' || project.id === 'crimson-leap';
-  const motion = useReveal();
+  const sectionContext = project.id === 'anchor-maze' ? 'anchor' : 'crimson';
+  const motion = useSectionMotion(sectionContext, activeSection);
 
   return (
     <article
       className={`project project--secondary motion-section ${motion.revealed ? 'is-revealed' : ''} ${project.id === 'anchor-maze' ? 'project--anchor' : ''} ${project.id === 'crimson-leap' ? 'project--crimson' : ''} ${reverse ? 'project--reverse' : ''}`}
       id={project.id}
-      ref={motion.ref}
+      data-motion-active={motion.isActive}
+      data-motion-epoch={motion.epoch}
       style={{ '--project-accent': project.accent }}
     >
       <div className="project-rule">
@@ -197,14 +209,15 @@ function SecondaryProject({ project, reverse = false }) {
   );
 }
 
-function ArchiveProject({ project }) {
-  const motion = useReveal();
+function ArchiveProject({ project, activeSection }) {
+  const motion = useSectionMotion('realmwalker', activeSection);
 
   return (
     <article
       className={`project project--archive project--realmwalker motion-section ${motion.revealed ? 'is-revealed' : ''}`}
       id={project.id}
-      ref={motion.ref}
+      data-motion-active={motion.isActive}
+      data-motion-epoch={motion.epoch}
       style={{ '--project-accent': project.accent }}
     >
       <svg className="realmwalker-trace" viewBox="0 0 420 90" aria-hidden="true" focusable="false">
@@ -234,12 +247,15 @@ function App() {
   const [bootstrapPhase, setBootstrapPhase] = useState('loading');
   const revealPortfolio = useCallback(() => setBootstrapPhase('revealing'), []);
   const completeBootstrap = useCallback(() => setBootstrapPhase('ready'), []);
-  const selectedMotion = useReveal({ threshold: 0.12 });
-  const aboutMotion = useReveal({ threshold: 0.12 });
-  const footerMotion = useReveal({ threshold: 0.05, rootMargin: '0px' });
+  const activeSection = useActivePortfolioSection(portfolioSections);
+  const motionEnabled = bootstrapPhase !== 'loading';
+  const heroMotion = useSectionMotion('hero', activeSection, { enabled: motionEnabled });
+  const selectedMotion = useSectionMotion('selected', activeSection, { enabled: motionEnabled });
+  const aboutMotion = useSectionMotion('about', activeSection, { enabled: motionEnabled });
+  const footerMotion = useSectionMotion('footer', activeSection, { enabled: motionEnabled });
 
   return (
-    <div className="portfolio-app" data-bootstrap={bootstrapPhase}>
+    <div className="portfolio-app" data-active-section={activeSection} data-bootstrap={bootstrapPhase}>
       {bootstrapPhase !== 'ready' ? (
         <PortfolioLoader
           heroImage={site.avatarPoster}
@@ -252,7 +268,13 @@ function App() {
         <GlobalNavigation name={site.name} motionReady={bootstrapPhase !== 'loading'} />
 
         <main id="main-content">
-          <section className="hero shell" id="hero" aria-labelledby="hero-title">
+          <section
+            className={`hero shell motion-section ${heroMotion.revealed ? 'is-revealed' : ''}`}
+            id="hero"
+            aria-labelledby="hero-title"
+            data-motion-active={heroMotion.isActive}
+            data-motion-epoch={heroMotion.epoch}
+          >
             <div className="hero__identity">
               <p className="eyebrow">Portfolio / 2026</p>
               <h1 id="hero-title">{site.name}</h1>
@@ -292,23 +314,26 @@ function App() {
         <section className="selected-works shell" id="selected-works" aria-label="代表作品">
           <header
             className={`section-intro motion-section ${selectedMotion.revealed ? 'is-revealed' : ''}`}
-            ref={selectedMotion.ref}
+            id="selected-intro"
+            data-motion-active={selectedMotion.isActive}
+            data-motion-epoch={selectedMotion.epoch}
           >
             <p className="eyebrow">01–04 / SELECTED</p>
             <p>这几个项目做法都不太一样：有的从规则出发，有的从视觉和数据结构出发。对我来说，它们都是把一个奇怪想法一路做成能玩的东西。</p>
           </header>
 
-          <FlagshipProject project={newton} />
-          <SecondaryProject project={anchor} />
-          <SecondaryProject project={crimson} reverse />
-          <ArchiveProject project={archive} />
+          <FlagshipProject project={newton} activeSection={activeSection} />
+          <SecondaryProject project={anchor} activeSection={activeSection} />
+          <SecondaryProject project={crimson} activeSection={activeSection} reverse />
+          <ArchiveProject project={archive} activeSection={activeSection} />
         </section>
 
         <section
           className={`about shell motion-section ${aboutMotion.revealed ? 'is-revealed' : ''}`}
           id="about"
           aria-labelledby="about-title"
-          ref={aboutMotion.ref}
+          data-motion-active={aboutMotion.isActive}
+          data-motion-epoch={aboutMotion.epoch}
         >
           <div className="about__heading">
             <p className="eyebrow">About / Contact</p>
@@ -333,7 +358,9 @@ function App() {
 
         <footer
           className={`site-footer motion-section ${footerMotion.revealed ? 'is-revealed' : ''}`}
-          ref={footerMotion.ref}
+          id="footer"
+          data-motion-active={footerMotion.isActive}
+          data-motion-epoch={footerMotion.epoch}
         >
           <div className="shell site-footer__inner">
             <p>诺米Styxia / Game Design Portfolio</p>
@@ -345,7 +372,8 @@ function App() {
 
       {bootstrapPhase === 'ready' ? (
         <GreenColleague
-          sectionTargets={companionSections}
+          currentSection={activeSection}
+          sectionTargets={portfolioSections}
           projectAnchors={companionProjectAnchors}
         />
       ) : null}

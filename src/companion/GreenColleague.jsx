@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { companionClips, preloadCompanionClip } from './companionAssets.js';
 import { companionIntroDialogue, getCompanionDialogue } from './companionDialogue.js';
 import {
-  useActivePortfolioSection,
   useCompanionMovement,
   useReducedMotion,
 } from './companionState.js';
@@ -180,7 +179,7 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }
   );
 }
 
-export function GreenColleague({ sectionTargets, projectAnchors }) {
+export function GreenColleague({ currentSection, sectionTargets, projectAnchors }) {
   const rootRef = useRef(null);
   const characterRef = useRef(null);
   const introInitiallySeenRef = useRef(null);
@@ -199,7 +198,6 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [locomotionReady, setLocomotionReady] = useState(false);
   const reducedMotion = useReducedMotion();
-  const currentSection = useActivePortfolioSection(sectionTargets);
   const introActive = introPhase !== INTRO_COMPLETE;
   const movement = useCompanionMovement({
     paused: dialogue !== null || introActive || ambientClipName !== null || !locomotionReady,
@@ -322,9 +320,12 @@ export function GreenColleague({ sectionTargets, projectAnchors }) {
   const openDialogue = () => {
     setAmbientClipName(null);
     animation.playTapReaction();
-    const seenCount = seenCountRef.current[currentSection] || 0;
-    setDialogue(getCompanionDialogue(currentSection, seenCount));
-    seenCountRef.current[currentSection] = seenCount + 1;
+    const dialogueContext = sectionTargets.find(
+      (section) => section.context === currentSection,
+    )?.dialogueContext || currentSection;
+    const seenCount = seenCountRef.current[dialogueContext] || 0;
+    setDialogue(getCompanionDialogue(dialogueContext, seenCount));
+    seenCountRef.current[dialogueContext] = seenCount + 1;
   };
 
   const handlePointerDown = (event) => {
