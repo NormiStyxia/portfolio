@@ -1472,7 +1472,7 @@ button {
   }
 
   .selected-works {
-    padding-block: 3.5rem 6rem;
+    padding-block: 3.5rem 3rem;
   }
 
   .section-intro {
@@ -1487,6 +1487,10 @@ button {
 
   .project {
     margin-bottom: 7.5rem;
+  }
+
+  .project--archive {
+    margin-bottom: 0;
   }
 
   .project-rule {
@@ -1657,7 +1661,7 @@ button {
 
   .about {
     display: block;
-    padding-block: 6rem;
+    padding-block: 3.5rem 6rem;
   }
 
   .about h2 {
