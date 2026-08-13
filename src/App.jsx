@@ -28,9 +28,15 @@ function ProjectMeta({ project }) {
         <dt>Duration</dt>
         <dd>{project.duration}</dd>
       </div>
+      {project.engine ? (
+        <div>
+          <dt>Engine</dt>
+          <dd>{project.engine}</dd>
+        </div>
+      ) : null}
       <div>
         <dt>Context</dt>
-        <dd>{project.platform || project.year}</dd>
+        <dd>{project.context || project.platform || project.year}</dd>
       </div>
     </dl>
   );
@@ -79,11 +85,6 @@ function FlagshipProject({ project }) {
           <ProjectMeta project={project} />
           <div className="project-evidence">
             <p>{project.summary}</p>
-            <ol>
-              {project.contributions.map((contribution) => (
-                <li key={contribution}>{contribution}</li>
-              ))}
-            </ol>
             <ProjectLinks project={project} />
           </div>
         </div>
@@ -203,7 +204,7 @@ function App() {
         <section className="selected-works shell" id="selected-works" aria-label="代表作品">
           <header className="section-intro">
             <p className="eyebrow">01–04 / SELECTED</p>
-            <p>四个不同阶段与方向的项目，分别展示规则设计、AI-native 系统、程序化视觉与工具链探索。</p>
+            <p>这几个项目做法都不太一样：有的从规则出发，有的从视觉和数据结构出发。对我来说，它们都是把一个奇怪想法一路做成能玩的东西。</p>
           </header>
 
           <FlagshipProject project={newton} />

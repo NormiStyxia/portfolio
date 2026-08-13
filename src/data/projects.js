@@ -25,6 +25,8 @@ const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
  * @property {string} duration
  * @property {string[]} role
  * @property {string=} platform
+ * @property {string=} engine
+ * @property {string=} context
  * @property {string} summary
  * @property {string} coreIdea
  * @property {string[]} contributions
@@ -44,7 +46,9 @@ export const projects = [
     duration: '21 Days',
     role: ['Game Design', 'Level Design', 'Visual', 'Tooling'],
     platform: 'TapTap Maker',
-    summary: '用可组合的物理规则，把一次发射变成能够阅读、推演与修正的解谜过程。',
+    engine: 'UrhoX',
+    context: 'TapTap Maker Game Jam',
+    summary: '最开始真的只是想做个让苹果到地方的小游戏。后来越做越觉得，“违反物理”本身不难，难的是怎么让玩家知道自己到底把世界改成了什么样。于是卡牌、牛顿拳、教学、回放，还有那个天天被玩家戳的绿毛同事，就这么一个个长出来了。',
     coreIdea: '修改重力、弹性与冲量，让“失控”成为一套可解释的规则。',
     contributions: ['核心规则与关卡', '教学与防卡关', '视觉、UI 与编辑器'],
     accent: '#7B583A',
