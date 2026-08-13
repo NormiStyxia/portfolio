@@ -637,6 +637,16 @@ button {
   font-size: clamp(1.12rem, 1.7vw, 1.55rem);
 }
 
+.secondary-copy > p.design-note {
+  max-width: 34rem;
+  margin: 0;
+  font-family: var(--font-cn-body);
+  font-weight: 400;
+  font-synthesis: none;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.55;
+}
+
 .secondary-copy .project-meta {
   grid-template-columns: 1fr;
 }
@@ -948,6 +958,11 @@ button {
 
   .secondary-copy .project-meta > div {
     padding: clamp(0.45rem, 0.9svh, 0.68rem) 0;
+  }
+
+  .secondary-copy > p.design-note {
+    font-size: clamp(0.9rem, 1vw, 1rem);
+    line-height: 1.55;
   }
 
   .secondary-copy .project-links {
@@ -1427,13 +1442,18 @@ button {
     margin: 0;
   }
 
-  .secondary-copy .contribution-list {
+  .secondary-copy > p.design-note {
     order: 6;
     width: 100%;
   }
 
-  .secondary-copy .project-links {
+  .secondary-copy .contribution-list {
     order: 7;
+    width: 100%;
+  }
+
+  .secondary-copy .project-links {
+    order: 8;
     width: 100%;
     margin-top: 0;
   }

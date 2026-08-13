@@ -94,6 +94,8 @@ function FlagshipProject({ project }) {
 }
 
 function SecondaryProject({ project, reverse = false }) {
+  const isAnchorMaze = project.id === 'anchor-maze';
+
   return (
     <article
       className={`project project--secondary ${reverse ? 'project--reverse' : ''}`}
@@ -114,11 +116,15 @@ function SecondaryProject({ project, reverse = false }) {
           </h3>
           <p className="project-core">{project.coreIdea}</p>
           <ProjectMeta project={project} />
-          <ul className="contribution-list">
-            {project.contributions.map((contribution) => (
-              <li key={contribution}>{contribution}</li>
-            ))}
-          </ul>
+          {isAnchorMaze ? (
+            <p className="design-note">{project.summary}</p>
+          ) : (
+            <ul className="contribution-list">
+              {project.contributions.map((contribution) => (
+                <li key={contribution}>{contribution}</li>
+              ))}
+            </ul>
+          )}
           <ProjectLinks project={project} />
         </div>
         <MediaFigure media={project.heroMedia} className="project-media project-media--secondary" />
