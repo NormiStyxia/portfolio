@@ -84,7 +84,7 @@ function FlagshipProject({ project }) {
         <div className="project-sidebar">
           <ProjectMeta project={project} />
           <div className="project-evidence">
-            <p>{project.summary}</p>
+            <p className="design-note">{project.summary}</p>
             <ProjectLinks project={project} />
           </div>
         </div>

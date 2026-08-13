@@ -568,11 +568,12 @@ button {
   padding-top: 2rem;
 }
 
-.project-evidence > p {
+.project-evidence > p.design-note {
   max-width: 34rem;
   margin: 0;
   font-family: var(--font-cn-body);
   font-weight: 400;
+  font-synthesis: none;
   font-size: clamp(1.05rem, 1.5vw, 1.3rem);
 }
 
