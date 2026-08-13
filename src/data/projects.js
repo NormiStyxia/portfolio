@@ -27,6 +27,8 @@ const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
  * @property {string=} platform
  * @property {string=} engine
  * @property {string=} context
+ * @property {string=} metaDuration
+ * @property {{role?: string, duration?: string, engine?: string, context?: string}=} metaLabels
  * @property {string} summary
  * @property {string} coreIdea
  * @property {string[]} contributions
@@ -141,10 +143,19 @@ export const projects = [
     englishTitle: 'Archive / Origin',
     year: '2026',
     duration: 'Early Exploration',
-    role: ['UI & Motion', 'Character Visual', 'Editor Origin'],
+    metaDuration: '早期探索',
+    role: ['UI', '动效', '角色视觉', '编辑器探索'],
     platform: 'TapTap Maker',
-    summary: '动画、UI 与可视化编辑器探索的起点；它解释后续工具链从哪里生长出来。',
-    coreIdea: '能力发展的源头，而不是与前三个项目争夺旗舰位置。',
+    engine: 'TapTap Maker / UrhoX',
+    context: 'TapTap Maker',
+    metaLabels: {
+      role: '职责',
+      duration: '阶段',
+      engine: '引擎',
+      context: '项目背景',
+    },
+    summary: '这是我最早的尝试，把一个二次元游戏从角色、界面一路做到动画和工具的项目。最开始只是想让角色页、任务页和场景切换看起来更像一个完整游戏，于是开始试类 Spine 动画、序列帧状态切换和各种 UI 转场。后来又觉得很多东西每次手调太麻烦，干脆开始做自己的可视化编辑器。现在回头看，它本身没有后面的几个项目完整，但后来一直在用的动画状态、编辑器和 AI 辅助工作流，很多都是从这里第一次冒出来的。',
+    coreIdea: '很多后来一直在用的做法，都是在这个项目里第一次试出来的。',
     contributions: ['角色与界面动效', '序列帧状态探索', '早期可视化编辑器'],
     accent: '#4A6698',
     heroMedia: {

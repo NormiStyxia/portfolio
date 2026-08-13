@@ -148,13 +148,8 @@ function ArchiveProject({ project }) {
           <p className="project-kicker">Early exploration / {project.year}</p>
           <h3>{project.title}</h3>
           <p className="project-core">{project.coreIdea}</p>
-          <p>{project.summary}</p>
           <ProjectMeta project={project} />
-          <ul className="archive-list">
-            {project.contributions.map((contribution) => (
-              <li key={contribution}>{contribution}</li>
-            ))}
-          </ul>
+          <p className="design-note">{project.summary}</p>
         </div>
       </div>
     </article>
