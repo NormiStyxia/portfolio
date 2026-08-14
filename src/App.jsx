@@ -34,6 +34,9 @@ const externalProps = {
   rel: 'noreferrer',
 };
 
+const heroLeadHighlight = '这个好像能玩。';
+const [heroLeadBefore, heroLeadAfter] = site.whatIDo.lead.split(heroLeadHighlight);
+
 function HeroAvatar({ animatedSrc, posterSrc, animate }) {
   const [src, setSrc] = useState(posterSrc || animatedSrc);
 
@@ -297,11 +300,11 @@ function App() {
 
           <div className="hero__motto">
             <p className="eyebrow">Personal Motto</p>
-            <p>{site.motto}</p>
+            <p><span className="text-highlight">{site.motto}</span></p>
           </div>
 
           <div className="hero__practice">
-            <p>{site.whatIDo.lead}</p>
+            <p>{heroLeadBefore}<span className="text-highlight">{heroLeadHighlight}</span>{heroLeadAfter}</p>
             <p>{site.whatIDo.detail}</p>
           </div>
 
