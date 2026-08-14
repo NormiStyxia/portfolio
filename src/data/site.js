@@ -5,7 +5,7 @@ export const site = {
   avatarPoster: `${import.meta.env.BASE_URL}assets/portfolio/hero/avatar-poster.png`,
   motto: '在还不熟悉世界的规则时，我先试着把自己的世界搭起来。',
   whatIDo: {
-    lead: '很多项目一开始其实就一句话：这个好像能玩。然后就一路做下去了。',
+    lead: '很多项目一开始其实就一句话：这个好像能玩。\n然后就一路做下去了。',
     detail: '从玩法、视觉到 AI-native 工作流，把想法一路做成真的能玩的东西。',
   },
   about: [
