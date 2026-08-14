@@ -174,7 +174,6 @@ function DialogueBubble({ dialogue, projectAnchors, onNavigate, onClose, style }
           ))}
         </nav>
       ) : null}
-      <span className="green-colleague__tail" aria-hidden="true" />
     </section>
   );
 }
@@ -412,8 +411,7 @@ export function GreenColleague({ currentSection, sectionTargets, projectAnchors 
     const edge = viewportWidth < 768 ? 10 : 16;
     const width = Math.min(viewportWidth - edge * 2, viewportWidth < 768 ? 300 : 320);
     const left = clamp(movement.x - width / 2, edge, viewportWidth - width - edge);
-    const tailLeft = clamp(movement.x - left, 22, width - 22);
-    return { left, width, tailLeft };
+    return { left, width };
   }, [movement.x, viewportWidth]);
 
   const clip = animation.clip;
@@ -445,7 +443,6 @@ export function GreenColleague({ currentSection, sectionTargets, projectAnchors 
           style={{
             '--bubble-left': `${bubbleMetrics.left}px`,
             '--bubble-width': `${bubbleMetrics.width}px`,
-            '--bubble-tail-left': `${bubbleMetrics.tailLeft}px`,
           }}
         />
       ) : null}

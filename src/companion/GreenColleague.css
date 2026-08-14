@@ -222,18 +222,6 @@
   color: var(--color-ink);
 }
 
-.green-colleague__tail {
-  position: fixed;
-  bottom: calc(var(--companion-ground-baseline) + var(--companion-character-height) + 0.3rem);
-  left: calc(var(--bubble-left) + var(--bubble-tail-left) - 0.35rem);
-  width: 0.7rem;
-  height: 0.7rem;
-  border-right: 1px solid var(--color-ink);
-  border-bottom: 1px solid var(--color-ink);
-  background: var(--color-canvas);
-  transform: rotate(45deg);
-}
-
 @media (max-width: 767px) {
   .green-colleague {
     --companion-character-height: clamp(13.5rem, 56vw, 14rem);
@@ -265,9 +253,6 @@
     grid-template-columns: 1fr;
   }
 
-  .green-colleague__tail {
-    bottom: calc(var(--companion-ground-baseline) + var(--companion-character-height) + 0.1rem);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
