@@ -255,6 +255,13 @@ button {
   line-height: 1.7;
 }
 
+.text-highlight {
+  padding: 0.04em 0.1em 0.08em;
+  background: color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .hero__practice {
   grid-column: 5 / 11;
   grid-row: 2;
