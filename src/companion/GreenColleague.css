@@ -224,7 +224,7 @@
 
 @media (max-width: 767px) {
   .green-colleague {
-    --companion-character-height: clamp(13.5rem, 56vw, 14rem);
+    --companion-character-height: clamp(8.75rem, 44vw, 14rem);
     --companion-ground-baseline: calc(env(safe-area-inset-bottom, 0px) + 0.2rem);
   }
 
