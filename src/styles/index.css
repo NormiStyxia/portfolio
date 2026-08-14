@@ -286,6 +286,7 @@ button {
   color: var(--color-text-secondary);
   font-size: clamp(0.95rem, 1.1vw, 1.08rem);
   line-height: 1.7;
+  white-space: nowrap;
 }
 
 .hero__actions {
@@ -1261,13 +1262,13 @@ button {
   }
 
   .hero__practice {
-    grid-column: 1 / 7;
+    grid-column: 1 / 9;
     grid-row: 3;
     margin-top: 2rem;
   }
 
   .hero__actions {
-    grid-column: 8 / 13;
+    grid-column: 10 / 13;
     grid-row: 3;
   }
 
@@ -1536,6 +1537,10 @@ button {
 
   .hero__practice p:first-child {
     font-size: 1.1rem;
+  }
+
+  .hero__practice p:last-child {
+    white-space: normal;
   }
 
   .hero__actions {
