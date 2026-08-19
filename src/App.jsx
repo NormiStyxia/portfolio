@@ -105,6 +105,12 @@ function ProjectMeta({ project }) {
         <dt>{labels.context || '项目背景'}</dt>
         <dd>{project.context || project.platform || project.year}</dd>
       </div>
+      {project.achievement ? (
+        <div>
+          <dt>{labels.achievement || '项目成绩'}</dt>
+          <dd>{project.achievement}</dd>
+        </div>
+      ) : null}
     </dl>
   );
 }
